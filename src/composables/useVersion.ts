@@ -6,8 +6,8 @@ const APP_VERSION = '0.1.0'
 // ============================================================
 //  👇 改成你自己的 GitHub 信息（仓库设为 public）
 // ============================================================
-const GITHUB_OWNER = '你的GitHub用户名'
-const GITHUB_REPO = '你的仓库名'
+const GITHUB_OWNER = 'ssk-shandm'
+const GITHUB_REPO = 'exam'
 
 /** GitHub API 最新 Release 地址（无需 token，公开仓库 60次/小时） */
 const GITHUB_API_URL = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/releases/latest`
