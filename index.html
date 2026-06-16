@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>刷题</title>
+    <style>
+      /* ==========================================================================
+         CSS 自定义属性 — 日间模式
+         ========================================================================== */
+      :root {
+        /* --- Page & Text --- */
+        --color-bg-page:                #f4f6f8;
+        --color-text-primary:           #333;
+        --color-text-heading:           #333;
+        --color-text-secondary:         #555;
+        --color-text-muted:             #666;
+        --color-text-placeholder:       #767676;
+
+        /* --- Containers --- */
+        --color-bg-container:           #ffffff;
+        --color-shadow-container:       0 4px 12px rgba(0,0,0,0.05);
+        --color-border-container:       transparent;
+
+        /* --- Surfaces & Cards --- */
+        --color-bg-surface:             #f8f9fa;
+        --color-bg-surface-alt:         #f9f9f9;
+        --color-border-surface:         #dee2e6;
+        --color-bg-surface-hover:       #f1f3f5;
+
+        /* --- Dividers --- */
+        --color-border-divider:         #eee;
+        --color-border-divider-strong:  #dee2e6;
+
+        /* --- Inputs --- */
+        --color-bg-input:               #ffffff;
+        --color-border-input:           #ccc;
+        --color-text-input:             #333;
+        --color-border-input-focus:     #007bff;
+        --color-shadow-input-focus:     rgba(0,123,255,0.15);
+        --color-bg-input-disabled:      #f8f9fa;
+        --color-text-input-disabled:    #777;
+        --color-accent:                 #007bff;
+
+        /* --- Option Labels --- */
+        --color-bg-option:              #f8f9fa;
+        --color-border-option:          #dee2e6;
+        --color-text-option:            #333;
+        --color-bg-option-disabled:     #f8f9fa;
+
+        /* --- Status: Correct --- */
+        --color-bg-correct:             #d4edda;
+        --color-border-correct:         #28a745;
+        --color-border-correct-left:    #28a745;
+        --color-text-correct:           #155724;
+        --color-badge-correct:          #28a745;
+        --color-bg-sub-correct:         #e8f5e9;
+
+        /* --- Status: Incorrect --- */
+        --color-bg-incorrect:           #f8d7da;
+        --color-border-incorrect:       #dc3545;
+        --color-border-incorrect-left:  #dc3545;
+        --color-text-incorrect:         #721c24;
+        --color-badge-incorrect:        #dc3545;
+        --color-bg-sub-incorrect:       #ffebee;
+
+        /* --- Status: Warning --- */
+        --color-bg-warning:             #fff3cd;
+        --color-border-warning:         #ffeaa7;
+        --color-text-warning:           #856404;
+
+        /* --- Button: Primary (Blue) --- */
+        --color-bg-btn-primary:         #007bff;
+        --color-text-btn-primary:       #ffffff;
+        --color-border-btn-primary:     transparent;
+        --color-bg-btn-primary-hover:   #0056b3;
+
+        /* --- Button: Success (Green) --- */
+        --color-bg-btn-success:         #28a745;
+        --color-text-btn-success:       #ffffff;
+        --color-border-btn-success:     transparent;
+        --color-bg-btn-success-hover:   #218838;
+        --color-bg-btn-success-disabled:#94d3a2;
+
+        /* --- Button: Danger (Red) --- */
+        --color-bg-btn-danger:          #dc3545;
+        --color-text-btn-danger:        #ffffff;
+        --color-border-btn-danger:      transparent;
+        --color-bg-btn-danger-hover:    #c82333;
+
+        /* --- Button: Warning (Yellow/Amber) --- */
+        --color-bg-btn-warning:         #ffc107;
+        --color-text-btn-warning:       #212529;
+        --color-border-btn-warning:     transparent;
+        --color-bg-btn-warning-hover:   #e0a800;
+
+        /* --- Button: Info (Teal) --- */
+        --color-bg-btn-info:            #17a2b8;
+        --color-text-btn-info:          #ffffff;
+        --color-border-btn-info:        transparent;
+        --color-bg-btn-info-hover:      #117a8b;
+
+        /* --- Button: Secondary (Gray) --- */
+        --color-bg-btn-secondary:       #6c757d;
+        --color-text-btn-secondary:     #ffffff;
+        --color-border-btn-secondary:   transparent;
+        --color-bg-btn-secondary-hover: #5a6268;
+
+        /* --- Button: Purple (Shuffle) --- */
+        --color-bg-btn-purple:          #6f42c1;
+        --color-text-btn-purple:        #ffffff;
+        --color-border-btn-purple:      transparent;
+        --color-bg-btn-purple-hover:    #5a32a3;
+
+        /* --- Dark Mode Toggle --- */
+        --color-bg-btn-toggle:          #343a40;
+        --color-text-btn-toggle:        #ffffff;
+
+        /* --- Question Type Tag --- */
+        --color-bg-tag:                 #e7f3ff;
+        --color-text-tag:               #0056b3;
+
+        /* --- Scenario Block --- */
+        --color-bg-scenario:            #f0f4f8;
+        --color-border-scenario:        #d0d7de;
+        --color-text-scenario-title:    #1a5276;
+        --color-text-scenario-body:     #333;
+
+        /* --- Sub-Question --- */
+        --color-text-sub-number:        #007bff;
+        --color-bg-sub-answer:          #f5f5f5;
+        --color-text-sub-answer:        #333;
+
+        /* --- Explanation / Endorse Block --- */
+        --color-bg-explanation:         #f3f4f6;
+        --color-border-explanation:     #007bff;
+        --color-text-explanation:       #333;
+
+        /* --- Code --- */
+        --color-bg-code-inline:         rgba(175,184,193,0.2);
+        --color-border-code-block:      transparent;
+        --color-bg-code-placeholder:    #f8f9fa;
+        --color-border-code-placeholder:#ccc;
+
+        /* --- Highlight --- */
+        --color-bg-highlight:           #f8f9fa;
+
+        /* --- Start Screen Mode Buttons --- */
+        --color-bg-btn-mode:            #ffffff;
+        --color-text-btn-mode:          #333;
+        --color-border-btn-mode:        #ccc;
+        --color-bg-btn-mode-hover:      #f8f9fa;
+        --color-bg-btn-wrong-mode:      #dc3545;
+        --color-text-btn-wrong-mode:    #ffffff;
+        --color-border-btn-wrong-mode:  #dc3545;
+        --color-bg-btn-wrong-mode-hover:#c82333;
+
+        /* --- Select --- */
+        --color-bg-select:              #ffffff;
+        --color-text-select:            #333;
+        --color-border-select:          #ccc;
+      }
+
+      /* ==========================================================================
+         CSS 自定义属性 — 夜间模式
+         ========================================================================== */
+      body.dark-mode {
+        --color-bg-page:                #121212;
+        --color-text-primary:           #e0e0e0;
+        --color-text-heading:           #f1f1f1;
+        --color-text-secondary:         #aaa;
+        --color-text-muted:             #777;
+        --color-text-placeholder:       #888;
+
+        --color-bg-container:           #1e1e1e;
+        --color-shadow-container:       0 4px 12px rgba(0,0,0,0.3);
+        --color-border-container:       #333;
+
+        --color-bg-surface:             #2a2a2a;
+        --color-bg-surface-alt:         #2c2c2c;
+        --color-border-surface:         #444;
+        --color-bg-surface-hover:       #454545;
+
+        --color-border-divider:         #333;
+        --color-border-divider-strong:  #444;
+
+        --color-bg-input:               #3a3a3a;
+        --color-border-input:           #555;
+        --color-text-input:             #f1f1f1;
+        --color-border-input-focus:     #5dade2;
+        --color-shadow-input-focus:     rgba(93,173,226,0.2);
+        --color-bg-input-disabled:      #2a2a2a;
+        --color-text-input-disabled:    #777;
+        --color-accent:                 #5dade2;
+
+        --color-bg-option:              #3a3a3a;
+        --color-border-option:          #555;
+        --color-text-option:            #e1e1e1;
+        --color-bg-option-disabled:     #2c2c2c;
+
+        --color-bg-correct:             #1e4620;
+        --color-border-correct:         #2e7d32;
+        --color-border-correct-left:    #2e7d32;
+        --color-text-correct:           #e8f5e9;
+        --color-badge-correct:          #4caf50;
+        --color-bg-sub-correct:         #1a3c1a;
+
+        --color-bg-incorrect:           #5c1e24;
+        --color-border-incorrect:       #842029;
+        --color-border-incorrect-left:  #7d2e2e;
+        --color-text-incorrect:         #f8d7da;
+        --color-badge-incorrect:        #f44336;
+        --color-bg-sub-incorrect:       #3c1a1a;
+
+        --color-bg-warning:             #664d03;
+        --color-border-warning:         #856404;
+        --color-text-warning:           #ffeaa7;
+
+        --color-bg-btn-primary:         #1a3c5e;
+        --color-text-btn-primary:       #badbf9;
+        --color-border-btn-primary:     #2c5480;
+        --color-bg-btn-primary-hover:   #1e6db5;
+
+        --color-bg-btn-success:         #1b5e20;
+        --color-text-btn-success:       #d4edda;
+        --color-border-btn-success:     #1e5c2e;
+        --color-bg-btn-success-hover:   #2e7d32;
+        --color-bg-btn-success-disabled:#3a5a3a;
+
+        --color-bg-btn-danger:          #5a2328;
+        --color-text-btn-danger:        #f8d7da;
+        --color-border-btn-danger:      #7a2e34;
+        --color-bg-btn-danger-hover:    #721c24;
+
+        --color-bg-btn-warning:         #7a5404;
+        --color-text-btn-warning:       #f1f1f1;
+        --color-border-btn-warning:     #856404;
+        --color-bg-btn-warning-hover:   #916305;
+
+        --color-bg-btn-info:            #134e57;
+        --color-text-btn-info:          #b8ebea;
+        --color-border-btn-info:        #1f6b75;
+        --color-bg-btn-info-hover:      #1a6b75;
+
+        --color-bg-btn-secondary:       #3a3a3a;
+        --color-text-btn-secondary:     #e0e0e0;
+        --color-border-btn-secondary:   #555;
+        --color-bg-btn-secondary-hover: #4a4a4a;
+
+        --color-bg-btn-purple:          #3d266b;
+        --color-text-btn-purple:        #e0d4f5;
+        --color-border-btn-purple:      #5a3d99;
+        --color-bg-btn-purple-hover:    #4e2d85;
+
+        --color-bg-btn-toggle:          #3a3a3a;
+        --color-text-btn-toggle:        #ffd700;
+
+        --color-bg-tag:                 #1a3c5e;
+        --color-text-tag:               #a6cbf3;
+
+        --color-bg-scenario:            #1e2a38;
+        --color-border-scenario:        #2c3e50;
+        --color-text-scenario-title:    #85c1e9;
+        --color-text-scenario-body:     #d4d4d4;
+
+        --color-text-sub-number:        #5dade2;
+        --color-bg-sub-answer:          #2a2a2a;
+        --color-text-sub-answer:        #d4d4d4;
+
+        --color-bg-explanation:         #2a2a2a;
+        --color-border-explanation:     #0d6efd;
+        --color-text-explanation:       #e1e1e1;
+
+        --color-bg-code-inline:         rgba(255,255,255,0.1);
+        --color-border-code-block:      #333;
+        --color-bg-code-placeholder:    #2a2a2a;
+        --color-border-code-placeholder:#444;
+
+        --color-bg-highlight:           #2a3a4a;
+
+        --color-bg-btn-mode:            #3a3a3a;
+        --color-text-btn-mode:          #e1e1e1;
+        --color-border-btn-mode:        #555;
+        --color-bg-btn-mode-hover:      #4a4a4a;
+        --color-bg-btn-wrong-mode:      #721c24;
+        --color-text-btn-wrong-mode:    #f1f1f1;
+        --color-border-btn-wrong-mode:  #842029;
+        --color-bg-btn-wrong-mode-hover:#842029;
+
+        --color-bg-select:              #3a3a3a;
+        --color-text-select:            #e1e1e1;
+        --color-border-select:          #555;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

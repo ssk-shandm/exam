@@ -1,0 +1,674 @@
+[
+  {
+    "number": 1,
+    "type": "单选题",
+    "question": "Java语言中，int类型数据占用的字节数是（ ）",
+    "options": {
+      "A": "1",
+      "B": "2",
+      "C": "4",
+      "D": "8"
+    },
+    "answer": "C"
+  },
+  {
+    "number": 2,
+    "type": "单选题",
+    "question": "下列哪个不是Java的关键字（ ）",
+    "options": {
+      "A": "const",
+      "B": "goto",
+      "C": "sizeof",
+      "D": "native"
+    },
+    "answer": "C"
+  },
+  {
+    "number": 3,
+    "type": "单选题",
+    "question": "执行语句 int x = 5; System.out.println(x++ * 2); 的输出结果是（ ）",
+    "options": {
+      "A": "10",
+      "B": "11",
+      "C": "12",
+      "D": "编译错误"
+    },
+    "answer": "A"
+  },
+  {
+    "number": 4,
+    "type": "单选题",
+    "question": "下列关于方法重载的说法，正确的是（ ）",
+    "options": {
+      "A": "方法名必须不同",
+      "B": "返回值类型必须不同",
+      "C": "参数列表必须不同",
+      "D": "访问修饰符必须不同"
+    },
+    "answer": "C"
+  },
+  {
+    "number": 5,
+    "type": "单选题",
+    "question": "下列代码的输出结果是（ ）\nString s1 = \"Java\";\nString s2 = new String(\"Java\");\nSystem.out.println(s1 == s2);\nSystem.out.println(s1.equals(s2));",
+    "options": {
+      "A": "true true",
+      "B": "false true",
+      "C": "true false",
+      "D": "false false"
+    },
+    "answer": "B"
+  },
+  {
+    "number": 6,
+    "type": "单选题",
+    "question": "下面关于接口的说法，错误的是（ ）",
+    "options": {
+      "A": "接口中的方法默认是public abstract",
+      "B": "接口中的变量默认是public static final",
+      "C": "一个类可以实现多个接口",
+      "D": "接口可以继承类"
+    },
+    "answer": "D"
+  },
+  {
+    "number": 7,
+    "type": "单选题",
+    "question": "下面哪种异常是受检异常（Checked Exception）（ ）",
+    "options": {
+      "A": "NullPointerException",
+      "B": "ArrayIndexOutOfBoundsException",
+      "C": "IOException",
+      "D": "ArithmeticException"
+    },
+    "answer": "C"
+  },
+  {
+    "number": 8,
+    "type": "单选题",
+    "question": "下列关于finally块的说法，正确的是（ ）",
+    "options": {
+      "A": "finally块在try块之前执行",
+      "B": "finally块在catch块之前执行",
+      "C": "finally块可能不会执行",
+      "D": "finally块总会执行"
+    },
+    "answer": "D"
+  },
+  {
+    "number": 9,
+    "type": "单选题",
+    "question": "下面关于ArrayList和LinkedList的说法，正确的是（ ）",
+    "options": {
+      "A": "ArrayList在中间插入元素比LinkedList快",
+      "B": "LinkedList在随机访问元素时比ArrayList快",
+      "C": "ArrayList是基于链表的",
+      "D": "LinkedList不需要连续的内存空间"
+    },
+    "answer": "D"
+  },
+  {
+    "number": 10,
+    "type": "单选题",
+    "question": "执行下列代码后，list中的元素是（ ）\nList<String> list = new ArrayList<>();\nlist.add(\"A\");\nlist.add(\"B\");\nlist.add(\"C\");\nlist.remove(1);\nlist.add(1, \"D\");",
+    "options": {
+      "A": "[A, D, C]",
+      "B": "[A, D, B, C]",
+      "C": "[A, B, C]",
+      "D": "[A, C, D]"
+    },
+    "answer": "A"
+  },
+  {
+    "number": 11,
+    "type": "填空题",
+    "question": "Java的三大特性是    、     、___。",
+    "answer": "封装、继承、多态"
+  },
+  {
+    "number": 12,
+    "type": "填空题",
+    "question": "假设有代码 int[] arr = {1, 2, 3, 4, 5};，则 arr.length 的值是 ______。",
+    "answer": "5"
+  },
+  {
+    "number": 13,
+    "type": "填空题",
+    "question": "在Java中，用于单行注释的符号是 ______，用于多行注释的符号是 ______。",
+    "answer": "//、/* ... */"
+  },
+  {
+    "number": 14,
+    "type": "判断题",
+    "question": "抽象类不能被实例化。（ ）",
+    "answer": "正确"
+  },
+  {
+    "number": 15,
+    "type": "判断题",
+    "question": "final类可以有子类。（ ）",
+    "answer": "错误"
+  },
+  {
+    "number": 16,
+    "type": "判断题",
+    "question": "在Java中，方法参数传递都是值传递。（ ）",
+    "answer": "正确"
+  },
+  {
+    "number": 17,
+    "type": "判断题",
+    "question": "String类是不可变类，StringBuilder类是可变的。（ ）",
+    "answer": "正确"
+  },
+  {
+    "number": 18,
+    "type": "判断题",
+    "question": "try块后面必须至少有一个catch块或finally块。（ ）",
+    "answer": "正确"
+  },
+  {
+    "number": 19,
+    "type": "程序分析题",
+    "question": "分析以下程序输出结果：\npublic class Test1 {\n    public static void main(String[] args) {\n        int a = 10;\n        int b = 20;\n        swap(a, b);\n        System.out.println(\"a=\" + a + \", b=\" + b);\n    }\n    \n    public static void swap(int x, int y) {\n        int temp = x;\n        x = y;\n        y = temp;\n    }\n}",
+    "answer": "a=10, b=20"
+  },
+  {
+    "number": 20,
+    "type": "程序分析题",
+    "question": "分析以下程序输出结果：\npublic class Test2 {\n    static int count = 0;\n    \n    public Test2() {\n        count++;\n    }\n    \n    public static void main(String[] args) {\n        Test2 t1 = new Test2();\n        Test2 t2 = new Test2();\n        Test2 t3 = new Test2();\n        System.out.println(\"创建的对象数：\" + count);\n    }\n}",
+    "answer": "创建的对象数：3"
+  },
+  {
+    "number": 21,
+    "type": "程序分析题",
+    "question": "补全以下代码，实现计算1到100的偶数和：\npublic class SumEven {\n    public static void main(String[] args) {\n        int sum = 0;\n        for (int i = 1; i <= 100; i++) {\n            if (______) {  // 判断是否为偶数\n                sum += ______;\n            }\n        }\n        System.out.println(\"1到100的偶数和为：\" + sum);\n    }\n}",
+    "answer": "第一空：i % 2 == 0\n第二空：i"
+  },
+  {
+    "number": 22,
+    "type": "程序分析题",
+    "question": "指出下面代码的错误并改正：\npublic class Test {\n    public void print() {\n        System.out.println(\"Hello\");\n    }\n    \n    public static void main(String[] args) {\n        print();\n    }\n}",
+    "answer": "错误：不能在静态方法中直接调用非静态方法。\n改正方法1：将print方法改为static\n改正方法2：创建对象后调用 test.print();"
+  },
+  {
+    "number": 23,
+    "type": "程序分析题",
+    "question": "分析以下程序输出结果：\npublic class Test3 {\n    public static void main(String[] args) {\n        String str = \"Hello\";\n        change(str);\n        System.out.println(str);\n    }\n    \n    public static void change(String s) {\n        s = s + \" World\";\n    }\n}",
+    "answer": "Hello"
+  },
+  {
+    "number": 24,
+    "type": "程序分析题",
+    "question": "分析以下程序输出结果：\nclass Parent {\n    public void show() {\n        System.out.println(\"Parent show\");\n    }\n}\n\nclass Child extends Parent {\n    @Override\n    public void show() {\n        System.out.println(\"Child show\");\n    }\n}\n\npublic class Test4 {\n    public static void main(String[] args) {\n        Parent p = new Child();\n        p.show();\n    }\n}",
+    "answer": "Child show"
+  },
+  {
+    "number": 25,
+    "type": "单选题",
+    "question": "在Java中，下列哪个关键字用于定义包？",
+    "options": {
+      "A": "package",
+      "B": "import",
+      "C": "class",
+      "D": "interface"
+    },
+    "answer": "A"
+  },
+  {
+    "number": 26,
+    "type": "单选题",
+    "question": "抽象类中可以包含以下哪种成员？",
+    "options": {
+      "A": "构造方法",
+      "B": "抽象方法",
+      "C": "静态方法",
+      "D": "以上都可以"
+    },
+    "answer": "D"
+  },
+  {
+    "number": 27,
+    "type": "单选题",
+    "question": "接口中的方法默认是：",
+    "options": {
+      "A": "public abstract",
+      "B": "private",
+      "C": "static",
+      "D": "final"
+    },
+    "answer": "A"
+  },
+  {
+    "number": 28,
+    "type": "单选题",
+    "question": "下列哪个是检查异常（Checked Exception）？",
+    "options": {
+      "A": "NullPointerException",
+      "B": "ArithmeticException",
+      "C": "IOException",
+      "D": "ArrayIndexOutOfBoundsException"
+    },
+    "answer": "C"
+  },
+  {
+    "number": 29,
+    "type": "单选题",
+    "question": "String 类是不可变的，下列哪个类是可变的字符串类？",
+    "options": {
+      "A": "StringBuffer",
+      "B": "String",
+      "C": "StringTokenizer",
+      "D": "StringReader"
+    },
+    "answer": "A"
+  },
+  {
+    "number": 30,
+    "type": "单选题",
+    "question": "下列集合中，哪个是有序且允许重复元素的？",
+    "options": {
+      "A": "HashSet",
+      "B": "TreeSet",
+      "C": "ArrayList",
+      "D": "HashMap"
+    },
+    "answer": "C"
+  },
+  {
+    "number": 31,
+    "type": "单选题",
+    "question": "用于处理字节流的抽象类是：",
+    "options": {
+      "A": "Reader",
+      "B": "Writer",
+      "C": "InputStream",
+      "D": "FileOutputStream"
+    },
+    "answer": "C"
+  },
+  {
+    "number": 32,
+    "type": "单选题",
+    "question": "在JDBC中，用于执行预编译SQL语句的接口是：",
+    "options": {
+      "A": "Statement",
+      "B": "PreparedStatement",
+      "C": "ResultSet",
+      "D": "DriverManager"
+    },
+    "answer": "B"
+  },
+  {
+    "number": 33,
+    "type": "单选题",
+    "question": "下列哪个方法用于获取Map中所有键的集合？",
+    "options": {
+      "A": "keySet()",
+      "B": "values()",
+      "C": "entrySet()",
+      "D": "getKeys()"
+    },
+    "answer": "A"
+  },
+  {
+    "number": 34,
+    "type": "单选题",
+    "question": "假设有如下代码：\nint a = 5, b = 3;\nint result = a > b ? (a % b == 0 ? a / b : a * b) : a + b;\nSystem.out.println(result);\n请问输出结果是？",
+    "options": {
+      "A": "5",
+      "B": "10",
+      "C": "15",
+      "D": "20"
+    },
+    "answer": "C"
+  },
+  {
+    "number": 35,
+    "type": "填空题",
+    "question": "使用关键字 (__________) 可以导入一个包中的类。",
+    "answer": "import"
+  },
+  {
+    "number": 36,
+    "type": "填空题",
+    "question": "如果一个类实现了某个接口，必须重写该接口中的所有( __________ )方法。",
+    "answer": "抽象"
+  },
+  {
+    "number": 37,
+    "type": "填空题",
+    "question": "在异常处理中，finally 块中的代码无论是否发生异常都会( __________)。",
+    "answer": "执行"
+  },
+  {
+    "number": 38,
+    "type": "填空题",
+    "question": "String类中用于获取字符串子串的方法是( __________)，说明应传入两个参数时，各参数的意义（        ）。",
+    "answer": "substring()\n子串的起始索引（包含）与 子串的结束索引（不包含）"
+  },
+  {
+    "number": 39,
+    "type": "填空题",
+    "question": "String sql = \"DELETE FROM students WHERE grade < 60\";\nint rows = stmt.(   ___ )(sql);",
+    "answer": "executeUpdate"
+  },
+  {
+    "number": 40,
+    "type": "判断题",
+    "question": "接口中可以有构造方法。（ ）",
+    "answer": "错误"
+  },
+  {
+    "number": 41,
+    "type": "判断题",
+    "question": "try-catch 语句中，可以没有 catch 块，但必须有 finally 块。（ ）",
+    "answer": "错误"
+  },
+  {
+    "number": 42,
+    "type": "判断题",
+    "question": "Set集合 中元素是有序的。（ ）",
+    "answer": "错误"
+  },
+  {
+    "number": 43,
+    "type": "判断题",
+    "question": "FileInputStream 用于以字符为单位读取文本文件内容。（ ）",
+    "answer": "错误"
+  },
+  {
+    "number": 44,
+    "type": "判断题",
+    "question": "JDBC的 ResultSet 对象用于表示查询结果集。（ ）",
+    "answer": "正确"
+  },
+  {
+    "number": 45,
+    "type": "程序分析题",
+    "question": "分析以下代码，写出输出结果：\ninterface Flyable {\n    void fly();\n}\n\nabstract class Animal {\n    abstract void sound();\n    void play(){\n         System.out.println(\"play\");\n    }\n}\n\nclass Bird extends Animal implements Flyable {\n    public void fly() {\n        System.out.println(\"Bird is flying\");\n    }\n    void sound() {\n        System.out.println(\"Chirp\");\n    }\n    void play(String name){\n         System.out.println(name+\"play\");\n    }\n\n}\n\npublic class Test {\n    public static void main(String[] args) {\n        Bird b = new Bird();\n        b.fly();\n        b.sound();\n        b.play();\n        b.play(\"ABC\");\n    }\n}",
+    "answer": "Bird is flying\nChirp\nplay\nABCplay"
+  },
+  {
+    "number": 46,
+    "type": "程序分析题",
+    "question": "下列代码要求读取同目录下的data.txt文件内容，补全以下代码：\nimport java.io.BufferedReader;\nimport java.io.FileReader;\nimport java.io.IOException;\n\npublic class FileReadExample {\n    public static void main(String[] args) {\n        try {\n            FileReader fileReader = null;\n            BufferedReader bufferedReader = null;\n            String line = null;\n            \n            fileReader =  【代码1】  ;\n            bufferedReader = 【代码2】; // 使用缓冲流包装文件流\n            \n            while (     【代码3】      ) { // 读取一行\n                【代码4】; // 将读取的一行输出到控制台\n            }\n        } catch (IOException e) {\n            System.out.println(\"读取文件出错：\" + e.getMessage());\n        } finally {\n            // 可在此处补充资源关闭代码（非本题考察点）\n        }\n    }\n}",
+    "answer": "【代码1】new FileReader(\"data.txt\")\n【代码2】new BufferedReader(fileReader)\n【代码3】(line = bufferedReader.readLine()) != null\n【代码4】System.out.println(line)"
+  },
+  {
+    "number": 47,
+    "type": "程序分析题",
+    "question": "分析以下异常处理代码，写出控制台输出：\npublic class ExceptionTest {\n    public static void main(String[] args) {\n        try {\n            int[] arr = {1, 2, 3};\n            System.out.println(arr[5]);\n        } catch (ArrayIndexOutOfBoundsException e) {\n            System.out.println(\"数组越界\");\n        } finally {\n            System.out.println(\"执行结束\");\n        }\n    }\n}",
+    "answer": "数组越界\n执行结束"
+  },
+  {
+    "number": 48,
+    "type": "程序分析题",
+    "question": "写出以下代码的输出结果：\nimport java.util.*;\n\npublic class CollectionTest {\n    public static void main(String[] args) {\n        Set<String> set = new HashSet<>();\n        set.add(\"Java\");\n        set.add(\"Python\");\n        set.add(\"Java\");\n        System.out.println(set.size());\n        System.out.println(set.contains(\"C++\"));\n    }\n}",
+    "answer": "2\nfalse"
+  },
+  {
+    "number": 49,
+    "type": "程序分析题",
+    "question": "以下JDBC代码用于查询学生信息，请补全缺失的代码，并说明主要流程：\nimport java.sql.*;\n\npublic class StudentQuery {\n    public static void main(String[] args) {\n        String url = [1] ;\n        String user = \"root\";\n        String password = \"123456\";\n        String sql = \"SELECT * FROM student\";\n        \n        try (Connection conn = [2] ;\n             Statement stmt = [3];\n             ResultSet rs = [4]) {\n            \n            while (rs.next()) {\n                System.out.println(\"ID: \" + rs.getInt(\"id\"));\n                System.out.println(\"Name: \" + rs.getString(\"name\"));\n            }\n        } catch (SQLException e) {\n            e.printStackTrace();\n        }\n    }\n}",
+    "answer": "[1]\"jdbc:mysql://localhost:3306/student_db\"\n[2]DriverManager.getConnection(url, user, password)\n[3]conn.createStatement()\n[4]stmt.executeQuery(sql)\n主要流程：连接数据库 → 创建语句 → 执行查询 → 遍历结果集"
+  },
+  {
+    "number": 50,
+    "type": "程序分析题",
+    "question": "分析以下代码，写出输出结果：\nclass Demo{\n\tprivate static int x ;\n\tpublic static void main(String[] args){\n\t\tSystem.out.println(x++);\n\t\tSystem.out.println(++x);\n}\n}",
+    "answer": "0\n2"
+  },
+  {
+    "number": 51,
+    "type": "单选题",
+    "question": "下列main方法声明中，正确的是（ ）",
+    "options": {
+      "A": "public void main(String args[])",
+      "B": "static void main(String args[])",
+      "C": "public static void main(String args)",
+      "D": "public static void main(String[] args)"
+    },
+    "answer": "D"
+  },
+  {
+    "number": 52,
+    "type": "单选题",
+    "question": "下列选项中，可以作为Java标识符的是（ ）",
+    "options": {
+      "A": "2score",
+      "B": "class",
+      "C": "_student",
+      "D": "my-name"
+    },
+    "answer": "C"
+  },
+  {
+    "number": 53,
+    "type": "单选题",
+    "question": "String s1 = \"hello\"; String s2 = new String(\"hello\"); 执行s1==s2的结果是（ ）",
+    "options": {
+      "A": "true",
+      "B": "false",
+      "C": "编译错误",
+      "D": "运行异常"
+    },
+    "answer": "B"
+  },
+  {
+    "number": 54,
+    "type": "单选题",
+    "question": "欲定义类方法（静态方法），应该使用哪个修饰符（ ）",
+    "options": {
+      "A": "public",
+      "B": "private",
+      "C": "static",
+      "D": "final"
+    },
+    "answer": "C"
+  },
+  {
+    "number": 55,
+    "type": "单选题",
+    "question": "关于方法重载，下列说法正确的是（ ）",
+    "options": {
+      "A": "方法名相同，返回值不同即可构成重载",
+      "B": "方法名相同，参数列表不同即可构成重载",
+      "C": "重载方法必须在同一个类中",
+      "D": "子类可以重载父类的方法"
+    },
+    "answer": "B"
+  },
+  {
+    "number": 56,
+    "type": "单选题",
+    "question": "下列哪个是抽象类的正确声明（ ）",
+    "options": {
+      "A": "abstract class Animal { }",
+      "B": "class abstract Animal { }",
+      "C": "abstract Animal class { }",
+      "D": "class Animal abstract { }"
+    },
+    "answer": "A"
+  },
+  {
+    "number": 57,
+    "type": "单选题",
+    "question": "关于访问修饰符，protected修饰的成员可以（ ）",
+    "options": {
+      "A": "只能在本类中访问",
+      "B": "本类和同包类可访问",
+      "C": "本类、同包类、子类可访问",
+      "D": "所有类都可访问"
+    },
+    "answer": "C"
+  },
+  {
+    "number": 58,
+    "type": "单选题",
+    "question": "下列异常中，属于运行时异常的是（ ）",
+    "options": {
+      "A": "IOException",
+      "B": "SQLException",
+      "C": "NullPointerException",
+      "D": "ClassNotFoundException"
+    },
+    "answer": "C"
+  },
+  {
+    "number": 59,
+    "type": "单选题",
+    "question": "关于ArrayList，下列说法错误的是（ ）",
+    "options": {
+      "A": "ArrayList可以存储重复元素",
+      "B": "ArrayList是有序集合",
+      "C": "ArrayList线程安全",
+      "D": "ArrayList基于数组实现"
+    },
+    "answer": "C"
+  },
+  {
+    "number": 60,
+    "type": "单选题",
+    "question": "以下哪一个是正确初始化数组的方式（ ）",
+    "options": {
+      "A": "int[1] a = new int[1]{1}",
+      "B": "int[] a = new int[1]{1}",
+      "C": "int[] a = new int[]{1}",
+      "D": "int[1] a = new int[1]"
+    },
+    "answer": "C"
+  },
+  {
+    "number": 61,
+    "type": "填空题",
+    "question": "面向对象的三大特征是：、、______。",
+    "answer": "封装、继承、多态"
+  },
+  {
+    "number": 62,
+    "type": "填空题",
+    "question": "假设int x = 3，三元表达式 x>2 ? x+2 : 5 的结果是______。",
+    "answer": "5"
+  },
+  {
+    "number": 63,
+    "type": "填空题",
+    "question": "在Java中，用于比较两个字符串内容的常用方法是______。",
+    "answer": "equals()"
+  },
+  {
+    "number": 64,
+    "type": "填空题",
+    "question": "final修饰的类表示______，final修饰的方法表示______。",
+    "answer": "不能被继承、不能被重写"
+  },
+  {
+    "number": 65,
+    "type": "填空题",
+    "question": "在异常处理中，无论是否发生异常都会执行的代码块是______。",
+    "answer": "finally块"
+  },
+  {
+    "number": 66,
+    "type": "填空题",
+    "question": "接口中的方法默认是______（public/private）和______（abstract/final）的。",
+    "answer": "public、abstract"
+  },
+  {
+    "number": 67,
+    "type": "填空题",
+    "question": "使用BufferedReader读取文件时，读取一行文本的方法是______。",
+    "answer": "readLine()"
+  },
+  {
+    "number": 68,
+    "type": "判断题",
+    "question": "在Java中，一个类可以实现多个接口，但只能继承一个父类。（ ）",
+    "answer": "正确"
+  },
+  {
+    "number": 69,
+    "type": "判断题",
+    "question": "静态方法可以直接访问非静态成员变量。（ ）",
+    "answer": "错误"
+  },
+  {
+    "number": 70,
+    "type": "判断题",
+    "question": "方法重写时，子类方法的访问权限不能比父类更严格。（ ）",
+    "answer": "正确"
+  },
+  {
+    "number": 71,
+    "type": "判断题",
+    "question": "static（静态）是Java中的一个修饰符，用于表示类级别的成员，而不是对象级别的成员。（ ）",
+    "answer": "正确"
+  },
+  {
+    "number": 72,
+    "type": "判断题",
+    "question": "隐藏对象的属性和实现细节，仅对外提供公有的方法描述的是面向对象的封装。（ ）",
+    "answer": "正确"
+  },
+  {
+    "number": 73,
+    "type": "程序分析题",
+    "question": "分析以下代码，写出输出结果（8分）\npublic class Test {\n    public static void main(String[] args) {\n        String s1 = \"Java\";\n        String s2 = \"Java\";\n        String s3 = new String(\"Java\");\n        \n        System.out.println(s1 == s2);\n        System.out.println(s1 == s3);\n        System.out.println(s1.equals(s3));\n    }\n}",
+    "answer": "true\nfalse\ntrue"
+  },
+  {
+    "number": 74,
+    "type": "程序分析题",
+    "question": "分析以下继承关系代码（10分）\nclass A {\n    public void show(int num) {\n        System.out.println(\"A\"+num);\n    }\n}\n\nclass B extends A {\n    @Override\n    public void show(int num) {\n        System.out.println(\"B\"+num);\n    }\n    \n    public void show(String msg) {\n        System.out.println(\"B:\" + msg);\n    }\n}\n\npublic class TestPoly {\n    public static void main(String[] args) {\n        A obj1 = new A();\n        A obj2 = new B();\n        B obj3 = new B();\n        \n        obj1.show(1);\n        obj2.show(1);\n        obj3.show(\"Hello\");\n    }\n}",
+    "answer": "A1\nB1\nB:Hello"
+  },
+  {
+    "number": 75,
+    "type": "程序分析题",
+    "question": "异常处理分析（6分）\npublic class ExceptionTest {\n    public static void main(String[] args) {\n        try {\n            int[] arr = {1, 2, 6};\n            System.out.println(arr[1]);\n            System.out.println(arr[6]);\n        } catch (ArrayIndexOutOfBoundsException e) {\n            System.out.println(\"数组越界\");\n        } finally {\n            System.out.println(\"执行finally\");\n        }\n        System.out.println(\"程序继续\");\n    }\n}",
+    "answer": "2\n数组越界\n执行finally\n程序继续"
+  },
+  {
+    "number": 76,
+    "type": "程序分析题",
+    "question": "集合操作分析（6分）\n指出下面一段代码中存在的错误（说明第几行出现了什么错误）。（5 分）\n1：public class Test{\n2： public static void main(String[] args) {\n3： ArrayList<String> list = new ArrayList<>();\n4： list.add(\"A\");\n5： list.add(\"B\");\n6： list.add(123);\n7： System.out.println(list.get(3));\n8： }\n9：}",
+    "answer": "（1）第六行传入参数的数据类型不是String，参数不匹配;\n（2）第七行下标越界。"
+  },
+  {
+    "number": 77,
+    "type": "编程题",
+    "question": "编写一个程序，实现以下功能：\n（1）创建一个ArrayList，存储10个随机整数（范围1-100）\n（2）在控制台输出ArrayList中的所有元素\n（3）删除ArrayList中所有的偶数元素\n（4）对剩余元素进行升序排序，并输出排序后的结果",
+    "answer": "import java.util.*;\n\npublic class ArrayListOperation {\n    public static void main(String[] args) {\n        // (1) 创建ArrayList并添加10个随机整数\n        List<Integer> list = new ArrayList<>();\n        Random rand = new Random();\n        for (int i = 0; i < 10; i++) {\n            list.add(rand.nextInt(100) + 1);\n        }\n        \n        // (2) 输出原始列表\n        System.out.println(\"原始列表：\" + list);\n\n        // (3) 删除所有偶数 - 使用迭代器避免并发修改异常\n        Iterator<Integer> iterator = list.iterator();\n        while (iterator.hasNext()) {\n            int num = iterator.next();\n            if (num % 2 == 0) {\n                iterator.remove();\n            }\n        }\n        System.out.println(\"删除偶数后：\" + list);\n\n        // (4) 排序并输出\n        Collections.sort(list);\n        System.out.println(\"排序后：\" + list);\n    }\n}"
+  },
+  {
+    "number": 78,
+    "type": "编程题",
+    "question": "设计并实现一个图书馆管理系统，具备以下功能：\n（1）创建抽象类LibraryItem（图书馆物品），包含：编号、标题、是否可借属性；抽象方法getItemType()；具体方法borrow()、returnItem()、displayInfo()。\n（2）创建子类Book（图书）：增加作者、ISBN、续借次数（最多2次）。\n（3）创建子类Magazine（杂志）：增加期号、出版社。\n（4）创建接口Renewable，包含canRenew()和renew()方法，Book类实现该接口，Magazine不实现。\n（5）创建测试类演示借出、归还、续借及多态遍历。",
+    "answer": "import java.util.ArrayList;\n\n// 抽象类\nabstract class LibraryItem {\n    protected String id;\n    protected String title;\n    protected boolean isAvailable;\n\n    public LibraryItem(String id, String title, boolean isAvailable) {\n        this.id = id;\n        this.title = title;\n        this.isAvailable = isAvailable;\n    }\n\n    public boolean isAvailable() {\n        return isAvailable;\n    }\n\n    public abstract String getItemType();\n\n    public void borrow() {\n        if (isAvailable) {\n            isAvailable = false;\n            System.out.println(title + \"已借出\");\n        } else {\n            System.out.println(title + \"已被借出\");\n        }\n    }\n\n    public void returnItem() {\n        isAvailable = true;\n        System.out.println(title + \"已归还\");\n    }\n\n    public void displayInfo() {\n        System.out.println(\"编号：\" + id + \"，标题：\" + title +\n                \"，类型：\" + getItemType() +\n                \"，状态：\" + (isAvailable ? \"可借\" : \"已借出\"));\n    }\n}\n\n// 接口\ninterface Renewable {\n    boolean canRenew();\n    void renew();\n}\n\n// Book类实现\nclass Book extends LibraryItem implements Renewable {\n    private String author;\n    private String isbn;\n    private int renewCount = 0;\n\n    public Book(String id, String title, boolean isAvailable, String author, String isbn) {\n        super(id, title, isAvailable);\n        this.author = author;\n        this.isbn = isbn;\n    }\n\n    @Override\n    public String getItemType() {\n        return \"图书\";\n    }\n\n    @Override\n    public boolean canRenew() {\n        return renewCount < 2; // 最多续借2次\n    }\n\n    @Override\n    public void renew() {\n        if (canRenew()) {\n            renewCount++;\n            System.out.println(title + \"续借成功，当前续借次数：\" + renewCount);\n        } else {\n            System.out.println(title + \"已达到最大续借次数\");\n        }\n    }\n}\n\n// Magazine 类\nclass Magazine extends LibraryItem {\n    private int issueNumber;\n    private String publisher;\n\n    public Magazine(String id, String title, boolean isAvailable, int issueNumber, String publisher) {\n        super(id, title, isAvailable);\n        this.issueNumber = issueNumber;\n        this.publisher = publisher;\n    }\n\n    @Override\n    public String getItemType() {\n        return \"杂志\";\n    }\n\n    @Override\n    public void displayInfo() {\n        super.displayInfo();\n        System.out.println(\"   期号：\" + issueNumber + \" | 出版社：\" + publisher);\n    }\n}\n\n// 测试类\nclass LibraryTest {\n    public static void main(String[] args) {\n        ArrayList<LibraryItem> libraryItems = new ArrayList<>();\n        \n        Book book1 = new Book(\"B001\", \"Java编程思想\", true, \"Bruce Eckel\",\"978-7-111-21382-6\");\n        Magazine magazine1 = new Magazine(\"M001\", \"计算机世界\", true, 202405, \"中国计算机报社\");\n\n        libraryItems.add(book1);\n        libraryItems.add(magazine1);\n\n        // 多态遍历\n        for (LibraryItem item : libraryItems) {\n            item.displayInfo();\n            // 尝试借出\n            if (item.isAvailable()) {\n                item.borrow();\n            }\n            // 尝试续借（仅针对实现了Renewable接口的物品）\n            if (item instanceof Renewable) {\n                ((Renewable) item).renew();\n            }\n            System.out.println(\"-------------------\");\n        }\n    }\n}"
+  },
+  {
+    "number": 79,
+    "type": "编程题",
+    "question": "设计并实现一个车辆租赁管理系统：\n（1）创建抽象类 Vehicle，包含常量 DAILY_RATE(200)、车牌号和抽象方法 displayBasicInfo()。\n（2）编写接口 Rentable，包含 calculateRentFee(int days) 和 isAvailable()。\n（3）创建子类 Car（轿车），包含品牌、座位数，实现上述接口和抽象方法。\n（4）创建子类 LuxuryCar（豪华轿车），包含是否含司机、附加费，重写计算租金方法（1.5倍费率+附加费）。\n（5）创建测试类测试功能。",
+    "answer": "abstract class Vehicle {\n    public static final double DAILY_RATE = 200;\n    protected String plateNumber;\n    \n    public Vehicle(String plateNumber) {\n        this.plateNumber = plateNumber;\n    }\n    public abstract void displayBasicInfo();\n}\n\ninterface Rentable {\n    double calculateRentFee(int days);\n    boolean isAvailable();\n}\n\nclass Car extends Vehicle implements Rentable {\n    private String brand;\n    private int seats;\n\n    public Car(String plateNumber, String brand, int seats) {\n        super(plateNumber);\n        this.brand = brand;\n        this.seats = seats;\n    }\n    \n    @Override\n    public void displayBasicInfo() {\n        System.out.println(\"轿车：\" + plateNumber + \" 品牌：\" + brand);\n    }\n    \n    @Override\n    public double calculateRentFee(int days) {\n        return DAILY_RATE * days;\n    }\n    \n    @Override\n    public boolean isAvailable() {\n        return true;\n    }\n}\n\nclass LuxuryCar extends Car {\n    private boolean chauffeurService;\n    private double extraFee;\n\n    public LuxuryCar(String plateNumber, String brand, int seats, boolean chauffeurService, double extraFee) {\n        super(plateNumber, brand, seats);\n        this.chauffeurService = chauffeurService;\n        this.extraFee = extraFee;\n    }\n    \n    @Override\n    public void displayBasicInfo() {\n        super.displayBasicInfo();\n        System.out.println(\"附加服务：\" + (chauffeurService ? \"包含司机\" : \"无司机\"));\n    }\n    \n    @Override\n    public double calculateRentFee(int days) {\n        return DAILY_RATE * days * 1.5 + extraFee;\n    }\n}\n\npublic class VehicleTest {\n    public static void main(String[] args) {\n        Car car = new Car(\"京A12345\", \"丰田\", 5);\n        LuxuryCar luxury = new LuxuryCar(\"京B88888\", \"奔驰\", 4, true, 500);\n        \n        car.displayBasicInfo();\n        System.out.println(\"3天租金：\" + car.calculateRentFee(3));\n        \n        luxury.displayBasicInfo();\n        System.out.println(\"3天租金：\" + luxury.calculateRentFee(3));\n    }\n}"
+  },
+  {
+    "number": 80,
+    "type": "编程题",
+    "question": "使用集合和I/O流实现学生信息管理：\n（1）使用 ArrayList 存储学生对象（学号、姓名、成绩）；\n（2）将学生信息写入文件 students.txt；\n（3）从文件中读取信息并输出到控制台；\n（4）计算并输出学生的平均成绩。",
+    "answer": "import java.io.*;\nimport java.util.*;\n\nclass Student {\n    String id, name;\n    double score;\n    public Student(String id, String name, double score) {\n        this.id = id; this.name = name; this.score = score;\n    }\n    public String toString() { return id + \",\" + name + \",\" + score; }\n}\n\npublic class StudentManager {\n    public static void main(String[] args) throws IOException {\n        List<Student> students = new ArrayList<>();\n        students.add(new Student(\"1001\", \"张三\", 85.5));\n        students.add(new Student(\"1002\", \"李四\", 92.0));\n        students.add(new Student(\"1003\", \"王五\", 78.5));\n\n        // 写入文件\n        try (BufferedWriter writer = new BufferedWriter(new FileWriter(\"students.txt\"))) {\n            for (Student s : students) {\n                writer.write(s.toString());\n                writer.newLine();\n            }\n        }\n\n        // 读取文件并计算平均分\n        double total = 0;\n        int count = 0;\n        try (BufferedReader reader = new BufferedReader(new FileReader(\"students.txt\"))) {\n            String line;\n            while ((line = reader.readLine()) != null) {\n                String[] parts = line.split(\",\");\n                System.out.println(\"读取学生：\" + parts[1] + \" 成绩：\" + parts[2]);\n                total += Double.parseDouble(parts[2]);\n                count++;\n            }\n        }\n        if (count > 0) System.out.println(\"平均成绩：\" + (total / count));\n    }\n}"
+  },
+  {
+    "number": 81,
+    "type": "编程题",
+    "question": "设计一个简单的员工管理系统：\n（1）创建抽象类Employee，包含属性：name、id，抽象方法：calculateSalary()。\n（2）创建子类FullTimeEmployee（全职员工），含属性月薪，实现方法返回月薪。\n（3）创建子类PartTimeEmployee（兼职员工），含属性时薪、工作时长，实现方法返回时薪×时长。\n（4）编写测试类计算工资。",
+    "answer": "abstract class Employee {\n    protected String name;\n    protected String id;\n    public Employee(String name, String id) {\n        this.name = name;\n        this.id = id;\n    }\n    public abstract double calculateSalary();\n}\n\nclass FullTimeEmployee extends Employee {\n    private double monthlySalary;\n    public FullTimeEmployee(String name, String id, double monthlySalary) {\n        super(name, id);\n        this.monthlySalary = monthlySalary;\n    }\n    @Override\n    public double calculateSalary() {\n        return monthlySalary;\n    }\n}\n\nclass PartTimeEmployee extends Employee {\n    private double hourlyRate;\n    private double hoursWorked;\n    public PartTimeEmployee(String name, String id, double hourlyRate, double hoursWorked) {\n        super(name, id);\n        this.hourlyRate = hourlyRate;\n        this.hoursWorked = hoursWorked;\n    }\n    @Override\n    public double calculateSalary() {\n        return hourlyRate * hoursWorked;\n    }\n}\n\npublic class TestEmployee {\n    public static void main(String[] args) {\n        FullTimeEmployee ft = new FullTimeEmployee(\"张三\", \"001\", 8000);\n        PartTimeEmployee pt = new PartTimeEmployee(\"李四\", \"002\", 50, 120);\n\n        System.out.println(\"全职员工\" + ft.name + \"工资：\" + ft.calculateSalary());\n        System.out.println(\"兼职员工\" + pt.name + \"工资：\" + pt.calculateSalary());\n    }\n}"
+  },
+  {
+    "number": 82,
+    "type": "编程题",
+    "question": "数组操作编程：\n（1）创建一个整型数组，初始值为10个1。\n（2）使用循环重新为数组赋值：arr[i] = i * 2 + 1（生成奇数序列）。\n（3）输出数组的所有元素。\n（4）计算数组中所有元素的平均值。\n（5）找出数组中的最大值和最小值。",
+    "answer": "public class ArrayOperation {\n    public static void main(String[] args) {\n        // 1. 初始化\n        int[] arr = new int[]{1, 1, 1, 1, 1, 1, 1, 1, 1, 1};\n        \n        // 2. 重新赋值\n        for (int i = 0; i < arr.length; i++) {\n            arr[i] = i * 2 + 1;\n        }\n\n        // 3. 输出并计算\n        int sum = 0;\n        int max = arr[0];\n        int min = arr[0];\n        \n        System.out.print(\"数组元素：\");\n        for (int i = 0; i < arr.length; i++) {\n            System.out.print(arr[i] + \" \");\n            sum += arr[i];\n            if (arr[i] > max) max = arr[i];\n            if (arr[i] < min) min = arr[i];\n        }\n        \n        System.out.println(\"\\n平均值：\" + (double)sum / arr.length);\n        System.out.println(\"最大值：\" + max);\n        System.out.println(\"最小值：\" + min);\n    }\n}"
+  }
+]
