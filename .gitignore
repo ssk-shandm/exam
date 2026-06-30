@@ -1,4 +1,4 @@
-# Logs
+# 日志
 logs
 *.log
 npm-debug.log*
@@ -7,14 +7,18 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# 依赖与构建产物
 node_modules
-.DS_Store
 dist
 dist-ssr
 coverage
-*.local
 
-# Editor directories and files
+# 本地环境与缓存
+*.local
+.eslintcache
+*.tsbuildinfo
+
+# 编辑器与 IDE
 .vscode/*
 !.vscode/extensions.json
 .idea
@@ -24,18 +28,39 @@ coverage
 *.sln
 *.sw?
 
-*.tsbuildinfo
-
-.eslintcache
-
-# Cypress
+# 测试截图
 /cypress/videos/
 /cypress/screenshots/
-
-# Vitest
 __screenshots__/
 
-# Tauri / Rust
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# Tauri / Rust 构建产物
 src-tauri/target/
 src-tauri/gen/
 *.exe
+
+# 误入的 Windows 盘符目录
+c/
+
+# ── AI / 编辑器辅助工具产物（非项目代码） ──
+.claude/
+.codegraph/
+.reasonix/
+reasonix.toml
+
+# ── 题库数据与用户数据（敏感/因人而异，不入库） ──
+# 题库 JSON 由用户自行导入；占位文件用 ! 单独放行
+public/subjects/*
+!public/subjects/.gitkeep
+# 题目图片
+public/images/*
+!public/images/.gitkeep
+# 错题本（运行时生成，纯用户数据）
+public/wrong-notebooks/*
+!public/wrong-notebooks/.gitkeep
+
+# 复习资料与临时文档
+计算机组成原理-综合复习.md

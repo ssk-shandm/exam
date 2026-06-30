@@ -51,6 +51,7 @@
           :user-answer="answerSheet.get(question.number)?.userAnswer ?? ''"
           :answer-format="question.answerFormat"
           :code-language="question.codeLanguage"
+          :answer-detail="question.answerDetail"
         />
         <!-- 复合题：显示子题结果汇总 -->
         <div v-else class="compound-review-summary">

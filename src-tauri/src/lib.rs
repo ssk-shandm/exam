@@ -1,4 +1,4 @@
-use tauri::Manager;
+use tauri::Manager as _;
 
 /// Return the current app version for the "about/update" UI
 #[tauri::command]
@@ -15,8 +15,7 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![get_app_version])
         .setup(|app| {
             #[cfg(debug_assertions)]
-            {
-                let window = app.get_webview_window("main").unwrap();
+            if let Some(window) = app.get_webview_window("main") {
                 window.open_devtools();
             }
             Ok(())

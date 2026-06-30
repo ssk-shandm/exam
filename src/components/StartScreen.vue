@@ -16,32 +16,37 @@
       </select>
     </div>
 
+    <!-- 父组件传入的内容（导入按钮、错题本列表等） -->
+    <slot />
+
     <p>请选择模式：</p>
     <div class="mode-buttons">
       <button @click="emit('start', 'exam')" class="mode-btn">考试模式</button>
       <button @click="emit('start', 'endorse')" class="mode-btn">背题模式</button>
       <button @click="emit('start', 'practice')" class="mode-btn">做题模式</button>
       <button @click="handleSpecialize" class="mode-btn">专项练习</button>
-      <button @click="emit('start', 'wrong')" class="mode-btn wrong-mode-btn">错题模式</button>
-    </div>
+      <button @click="emit('start', 'wrong-manage')" class="mode-btn wrong-mode-btn">错题模式</button>
 
-    <!-- 专项练习：题型筛选浮层 -->
-    <div v-if="showSpecializePanel" class="specialize-panel">
-      <p class="specialize-title">选择要练习的题型：</p>
-      <label
-        v-for="qt in availableQuestionTypes"
-        :key="qt"
-        class="specialize-option"
-      >
-        <input type="checkbox" :value="qt" v-model="selectedTypes" />
-        {{ qt }}
-      </label>
-      <div class="specialize-actions">
-        <button @click="confirmSpecialize" class="mode-btn" :disabled="selectedTypes.length === 0">
-          开始练习
-        </button>
-        <button @click="showSpecializePanel = false" class="mode-btn cancel-btn">取消</button>
-      </div>
+      <!-- 专项练习：题型筛选浮层（右侧浮动） -->
+      <Transition name="slide-right">
+        <div v-if="showSpecializePanel" class="specialize-panel">
+          <p class="specialize-title">选择要练习的题型：</p>
+          <label
+            v-for="qt in availableQuestionTypes"
+            :key="qt"
+            class="specialize-option"
+          >
+            <input type="checkbox" :value="qt" v-model="selectedTypes" />
+            {{ qt }}
+          </label>
+          <div class="specialize-actions">
+            <button @click="confirmSpecialize" class="mode-btn" :disabled="selectedTypes.length === 0">
+              开始练习
+            </button>
+            <button @click="showSpecializePanel = false" class="mode-btn cancel-btn">取消</button>
+          </div>
+        </div>
+      </Transition>
     </div>
 
     <!-- 版本信息与更新 -->
@@ -172,6 +177,7 @@ function handleCheckUpdate() {
   color: var(--color-text-input);
 }
 .mode-buttons {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 15px;
@@ -208,14 +214,36 @@ function handleCheckUpdate() {
   background-color: var(--color-bg-btn-wrong-mode-hover);
 }
 
-/* ===== 专项练习浮层 ===== */
+/* ===== 专项练习浮层（右侧浮动） ===== */
 .specialize-panel {
-  margin-top: 20px;
+  position: absolute;
+  left: calc(100% + 24px);
+  top: 0;
   padding: 20px;
   border: 1px solid var(--color-border-container);
   border-radius: 10px;
   background-color: var(--color-bg-surface);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
   text-align: left;
+  width: 240px;
+  z-index: 20;
+}
+.slide-right-enter-active,
+.slide-right-leave-active {
+  transition: all 0.25s ease;
+}
+.slide-right-enter-from,
+.slide-right-leave-to {
+  opacity: 0;
+  transform: translateX(20px);
+}
+@media (max-width: 768px) {
+  .specialize-panel {
+    left: 0;
+    top: 100%;
+    margin-top: 12px;
+    width: 100%;
+  }
 }
 .specialize-title {
   font-weight: 600;

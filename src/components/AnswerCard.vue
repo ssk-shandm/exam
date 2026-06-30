@@ -134,8 +134,9 @@ function getButtonClass(question: Question, index: number) {
       }
       if (totalAnswered > 0) {
         if (correctCount === totalAnswered) {
+          const isGR = props.bankFile && quizStore.isGuessedRight(question.number, props.bankFile)
           classes.push(props.appMode === 'wrong' ? 'correct' : (
-            props.bankFile && quizStore.isGuessedRight(question.number, props.bankFile) ? 'guessed-right' : 'correct'
+            isGR ? 'guessed-right' : 'correct'
           ))
         } else if (correctCount === 0) {
           classes.push('incorrect')
@@ -152,8 +153,12 @@ function getButtonClass(question: Question, index: number) {
   }
 
   if (entry?.isCorrect === true) {
+    const isGR = props.bankFile && quizStore.isGuessedRight(question.number, props.bankFile)
+    if (!isGR && props.bankFile) {
+      console.log('[AnswerCard] not guessed-right for q', question.number, 'bankFile:', props.bankFile)
+    }
     classes.push(props.appMode === 'wrong' ? 'correct' : (
-      props.bankFile && quizStore.isGuessedRight(question.number, props.bankFile) ? 'guessed-right' : 'correct'
+      isGR ? 'guessed-right' : 'correct'
     ))
   } else if (entry?.isCorrect === false) {
     classes.push('incorrect')

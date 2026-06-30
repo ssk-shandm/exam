@@ -32,11 +32,22 @@ export interface Question {
   scenarioFormat?: 'text' | 'markdown'
   /** 子题列表，有此字段即为复合题型 */
   subQuestions?: SubQuestion[]
+  /**
+   * 填空题多答案配置（单空可接受多个不同答案）。
+   * 有此字段时，checkAnswer 会逐个匹配 accepts 中的值，任一匹配即算正确。
+   * 无此字段时保持原有精确匹配逻辑，向后兼容。
+   */
+  answerDetail?: {
+    /** 所有可接受的正确答案列表（大小写不敏感、忽略首尾空格） */
+    accepts: string[]
+  }
+  /** 与题目关联的图片路径（相对于 public/ 目录）。如 ["/images/image1.png"] */
+  images?: string[]
 }
 
 export type UserAnswer = string | string[] | null
 
-export type AppMode = 'start' | 'practice' | 'endorse' | 'exam' | 'review' | 'wrong' | 'specialize'
+export type AppMode = 'start' | 'practice' | 'endorse' | 'exam' | 'review' | 'wrong' | 'wrong-manage' | 'specialize'
 
 /** 错题本中的一条记录（允许重复，按添加时间排序） */
 export interface WrongQuestionEntry {
@@ -44,4 +55,14 @@ export interface WrongQuestionEntry {
   questionNumber: number
   bankFile: string
   addedAt: number
+  /** 所属错题本 id，用于多错题本管理 */
+  notebookId?: string
+}
+
+/** 错题本（可创建多个） */
+export interface WrongNotebook {
+  id: string
+  name: string
+  bankFile: string
+  createdAt: number
 }

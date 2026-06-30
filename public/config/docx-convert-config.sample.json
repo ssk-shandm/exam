@@ -1,0 +1,90 @@
+{
+  "$schema": "docx-convert-config.schema.json",
+  "version": "1.0.0",
+  "description": "用于添加新docx文件转换的配置文件。每份docx对应一个此配置。",
+
+  "source": {
+    "file": "计算机组成与系统结构-2025-2026-2-练习题.docx",
+    "encoding": "utf-8"
+  },
+
+  "output": {
+    "file": "计算机组成与系统结构.json",
+    "format": "questionBank"
+  },
+
+  "parsing": {
+    "questionSeparator": {
+      "type": "numberPrefix",
+      "pattern": "^\\s*(\\d+)[\\.\\、）)]\\s*"
+    },
+
+    "typeDetection": [
+      {
+        "type": "单选题",
+        "keywords": ["下列", "正确的是", "错误的是", "不属于", "不属于"],
+        "optionPattern": "^\\s*[A-H][\\.\\、）)]\\s*"
+      },
+      {
+        "type": "判断题",
+        "keywords": ["判断", "是否正确", "对错"],
+        "answerPattern": "^(正确|错误|对|错|√|×|T|F)$"
+      },
+      {
+        "type": "填空题",
+        "keywords": ["______", "____", "（ ）", "（）", "填空"]
+      },
+      {
+        "type": "简答题",
+        "keywords": ["简述", "什么是", "解释", "定义", "说明"]
+      },
+      {
+        "type": "程序分析题",
+        "keywords": ["输出结果", "分析以下程序", "补全以下代码", "指出下面代码"]
+      },
+      {
+        "type": "编程题",
+        "keywords": ["编写", "设计并实现", "编程", "程序实现"]
+      },
+      {
+        "type": "代码应用题",
+        "keywords": ["请将下面", "补充完整", "typedef", "struct"]
+      }
+    ],
+
+    "optionLabels": ["A", "B", "C", "D", "E", "F", "G", "H"],
+
+    "answerExtraction": {
+      "单选题": { "pattern": "^答案[：:]\\s*([A-H])", "fallback": "trailingAnswer" },
+      "判断题": { "pattern": "^答案[：:]\\s*(正确|错误)", "fallback": "trailingAnswer" },
+      "填空题": { "pattern": "^答案[：:]\\s*(.+)", "fallback": "trailingAnswer" },
+      "简答题": { "pattern": "^答案[：:]\\s*(.+)", "fallback": "trailingAnswer" },
+      "程序分析题": { "pattern": "^答案[：:]\\s*(.+)", "fallback": "trailingAnswer" },
+      "编程题": { "pattern": "^答案[：:]\\s*(.+)", "fallback": "trailingAnswer" },
+      "代码应用题": { "pattern": "^答案[：:]\\s*(.+)", "fallback": "trailingAnswer" }
+    },
+
+    "postProcessing": {
+      "trimWhitespace": true,
+      "collapseBlankLines": true,
+      "normalizeOptionLabels": true,
+      "stripAnswerPrefix": "答案："
+    }
+  },
+
+  "exampleQuestions": [
+    {
+      "number": 1,
+      "type": "单选题",
+      "question": "示例题目文本……",
+      "options": { "A": "选项A", "B": "选项B", "C": "选项C", "D": "选项D" },
+      "answer": "A"
+    },
+    {
+      "number": 2,
+      "type": "简答题",
+      "question": "示例简答题……",
+      "answer": "参考答案"
+    }
+  ]
+}

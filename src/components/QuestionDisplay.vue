@@ -10,6 +10,16 @@
       </div>
     </div>
 
+    <div v-if="question.images?.length" id="question-images">
+      <img
+        v-for="(img, idx) in question.images"
+        :key="idx"
+        :src="img"
+        :alt="'题目配图 ' + (idx + 1)"
+        class="question-image"
+      />
+    </div>
+
     <div id="options-container" class="options-container">
       <!-- 复合题：场景 + 子题列表 -->
       <CompoundQuestion
@@ -63,7 +73,23 @@
       </div>
 
       <div v-else-if="isFillInBlank">
+        <div v-if="isMultiBlank" class="multi-blank-container">
+          <div v-for="(_, idx) in blankCount" :key="idx" class="blank-field">
+            <span class="blank-label">空{{ idx + 1 }}:</span>
+            <input
+              type="text"
+              class="fill-in-blank-input"
+              :value="blanks[idx] || ''"
+              @input="updateBlank(idx, ($event.target as HTMLInputElement).value)"
+              @keydown.enter.prevent="handleMainSubmit"
+              :placeholder="'请输入第' + (idx + 1) + '个空'"
+              :disabled="disabled"
+              autocomplete="off"
+            />
+          </div>
+        </div>
         <input
+          v-else
           type="text"
           id="fill-in-blank"
           :value="modelValue || ''"
@@ -71,6 +97,7 @@
           @keydown.enter.prevent="handleMainSubmit"
           placeholder="请输入你的答案"
           :disabled="disabled"
+          autocomplete="off"
         />
       </div>
 
@@ -135,6 +162,8 @@
       :user-answer="modelValue"
       :answer-format="question.answerFormat"
       :code-language="question.codeLanguage"
+      :answer-detail="question.answerDetail"
+      :question-type="question.type"
     />
 
     <div class="wrong-question-controls" v-if="isInPracticeMode || isInWrongMode">
@@ -158,7 +187,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { renderMarkdown } from '../utils/markdown'
 import type { Question, UserAnswer, AppMode, SubAnswer } from '../types'
 import ResultDisplay from './ResultDisplay.vue'
@@ -201,6 +230,36 @@ const judgmentOptions = { A: '正确', B: '错误' }
 const isRadio = computed(() => ['单选题', '单选', '判断题', '判断'].includes(props.question.type))
 const isCheckbox = computed(() => ['多选题', '多选'].includes(props.question.type))
 const isFillInBlank = computed(() => ['填空题', '填空'].includes(props.question.type))
+/** 填空题的空位数：统计题目文本中 ______ 的出现次数 */
+const blankCount = computed(() => {
+  if (!isFillInBlank.value) return 0
+  const matches = props.question.question.match(/_{6,}/g)
+  return matches ? matches.length : 1
+})
+/** 是否为多空填空题 */
+const isMultiBlank = computed(() => blankCount.value > 1)
+/** 多空填空题的各个空的值 */
+const blanks = ref<string[]>([])
+
+// 当 modelValue 变化时（如加载已有答案），同步 blanks
+watch(
+  () => props.modelValue,
+  (val) => {
+    if (isMultiBlank.value && typeof val === 'string') {
+      const parts = val.split('；')
+      blanks.value = [...parts]
+    }
+  },
+  { immediate: true },
+)
+
+function updateBlank(idx: number, value: string) {
+  const copy = [...blanks.value]
+  copy[idx] = value
+  blanks.value = copy
+  // 用中文分号连接后向上传递
+  emitAnswer(copy.join('；'))
+}
 const isShortAnswer = computed(() => ['简答题', '简答'].includes(props.question.type))
 const isProgramAnalysis = computed(() => ['程序分析题', '程序分析'].includes(props.question.type))
 const isCodeQuestion = computed(() => ['编程题', '编程', '代码题'].includes(props.question.type))
@@ -255,16 +314,19 @@ const isGuessedRight = computed(() =>
 )
 
 function addToWrong() {
-  if (props.bankFile) {
+  if (props.bankFile && !quizStore.containsWrongEntry(props.question.number, props.bankFile)) {
     quizStore.addWrongEntry(props.question.number, props.bankFile)
   }
 }
 
 function addGuessed() {
   if (props.bankFile) {
-    // 同时标记为蒙对 + 加入错题本（确保错题本里有记录）
+    // 同时标记为蒙对 + 加入错题本（确保错题本里有记录，去重）
+    console.log('[QuestionDisplay] addGuessed called with bankFile:', props.bankFile, 'q:', props.question.number)
     quizStore.addGuessedRight(props.question.number, props.bankFile)
-    quizStore.addWrongEntry(props.question.number, props.bankFile)
+    if (!quizStore.containsWrongEntry(props.question.number, props.bankFile)) {
+      quizStore.addWrongEntry(props.question.number, props.bankFile)
+    }
   }
 }
 
@@ -380,6 +442,19 @@ function getOptionClass(key: string) {
   border-radius: 6px;
 }
 
+#question-images {
+  margin: 16px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.question-image {
+  max-width: 100%;
+  height: auto;
+  border: 1px solid var(--color-border-option);
+  border-radius: 8px;
+}
+
 .options-container {
   display: flex;
   flex-direction: column;
@@ -406,6 +481,50 @@ input:disabled {
 }
 .option-label:has(input:disabled) {
   background-color: var(--color-bg-option-disabled);
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.multi-blank-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.blank-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.blank-label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--color-text-secondary, #666);
+  white-space: nowrap;
+  min-width: 40px;
+}
+
+.fill-in-blank-input {
+  flex: 1;
+  padding: 12px;
+  font-size: 1rem;
+  border: 1px solid var(--color-border-input);
+  border-radius: 8px;
+  box-sizing: border-box;
+  font-family: inherit;
+  line-height: 1.5;
+  background-color: var(--color-bg-input);
+  color: var(--color-text-input);
+}
+
+.fill-in-blank-input::placeholder {
+  color: var(--color-text-placeholder);
+}
+
+.fill-in-blank-input:disabled {
+  background-color: var(--color-bg-input-disabled);
+  color: var(--color-text-input-disabled);
   opacity: 0.7;
   cursor: not-allowed;
 }

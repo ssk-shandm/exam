@@ -1,0 +1,41 @@
+# 构建依赖与产物（镜像内重新生成）
+node_modules
+dist
+dist-ssr
+coverage
+
+# Tauri / Rust（桌面端，容器内不需要）
+src-tauri/target
+src-tauri/gen
+*.exe
+
+# AI / 编辑器辅助工具
+.claude
+.codegraph
+.reasonix
+reasonix.toml
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# 文档与脚本（不影响 Web 构建）
+*.md
+TAURI_GUIDE.md
+scripts/
+
+# Docker 自身
+Dockerfile
+.dockerignore
+docker/
+
+# 环境与缓存
+.eslintcache
+*.log
+*.local
+*.tsbuildinfo
+
+# 用户运行时数据
+public/wrong-notebooks/*
+!public/wrong-notebooks/.gitkeep

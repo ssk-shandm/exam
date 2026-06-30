@@ -17,8 +17,10 @@ exam/
 │   └── src/
 │       ├── main.rs           # 入口
 │       └── lib.rs            # Rust 命令（get_app_version）
-└── public/
-    └── version.sample.json   # 远程版本检查 JSON 模板
+├── public/
+│   ├── config/
+│   │   └── version.sample.json   # 远程版本检查 JSON 模板
+│   └── subjects/                 # 各科题库 JSON
 ```
 
 ---

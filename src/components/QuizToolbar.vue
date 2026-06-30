@@ -41,6 +41,9 @@
   <h2 v-if="mode === 'wrong' && questionCount === 0" class="no-questions-text">
     错题本是空的，请先在其他模式中添加错题。
   </h2>
+  <div v-if="mode === 'wrong' && questionCount > 0 && notebookName" class="notebook-info">
+    当前错题本：<strong>{{ notebookName }}</strong>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -50,6 +53,8 @@ defineProps<{
   mode: string
   wrongCount: number
   questionCount: number
+  /** 当前活跃的错题本名称（wrong 模式显示） */
+  notebookName?: string
 }>()
 
 defineEmits<{
@@ -75,6 +80,17 @@ defineEmits<{
   background-color: var(--color-bg-container);
   border-bottom: 1px solid var(--color-border-divider);
   box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+.no-questions-text {
+  text-align: center;
+  color: var(--color-text-muted);
+  padding: 20px;
+}
+.notebook-info {
+  font-size: 0.82rem;
+  color: var(--color-text-secondary);
+  margin-top: 4px;
+  padding: 2px 0;
 }
 .toolbar-btn {
   padding: 6px 12px;
