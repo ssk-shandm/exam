@@ -9,7 +9,7 @@
  *
  * 输出:
  *   public/<题库名>.json              — 题库 JSON
- *   public/images/<题库名>_imageN.png — 配图（如有）
+ *   public/images/<题库名>/imageN.png — 配图（如有）
  *
  * 依赖: 系统需有 unzip 命令（Git Bash / WSL / macOS / Linux 均自带）
  */
@@ -82,24 +82,24 @@ function extractImages(path) {
   }
   if (imageFiles.length === 0) return [];
 
-  mkdirSync(IMAGES, { recursive: true });
-  const prefix = bankName.replace(/[\\/:*?"<>|]/g, '_') + '_';
+  const safeName = bankName.replace(/[\\/:*?"<>|]/g, '_');
+  const bankImagesDir = join(IMAGES, safeName);
+  mkdirSync(bankImagesDir, { recursive: true });
   const imgPaths = [];
 
   for (const img of imageFiles) {
-    const destName = prefix + img;
-    execSync(`unzip -o "${path}" "word/media/${img}" -d "${IMAGES}"`, {
+    execSync(`unzip -o "${path}" "word/media/${img}" -d "${bankImagesDir}"`, {
       encoding: 'utf8', stdio: 'pipe',
     });
-    const src = join(IMAGES, 'word', 'media', img);
-    const dest = join(IMAGES, destName);
+    const src = join(bankImagesDir, 'word', 'media', img);
+    const dest = join(bankImagesDir, img);
     if (existsSync(src)) {
       renameSync(src, dest);
-      imgPaths.push('/images/' + destName);
+      imgPaths.push('/images/' + safeName + '/' + img);
     }
   }
   // 清理 unzip 产生的目录结构
-  const wordDir = join(IMAGES, 'word');
+  const wordDir = join(bankImagesDir, 'word');
   if (existsSync(wordDir)) {
     rmSync(wordDir, { recursive: true, force: true });
   }
