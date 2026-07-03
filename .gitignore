@@ -19,8 +19,7 @@ coverage
 *.tsbuildinfo
 
 # 编辑器与 IDE
-.vscode/*
-!.vscode/extensions.json
+.vscode/
 .idea
 *.suo
 *.ntvs*
@@ -64,3 +63,4 @@ public/wrong-notebooks/*
 
 # 复习资料与临时文档
 计算机组成原理-综合复习.md
+tmp/

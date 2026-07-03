@@ -315,7 +315,7 @@ onErrorCaptured((err) => { console.error(err); renderError.value = String(err); 
 <style scoped>
 .quiz-layout { display:flex; gap:24px; width:90%; max-width:1200px; margin:20px auto; align-items:start }
 .quiz-sidebar { flex:0 0 auto; position:sticky; top:20px; max-height:calc(100vh - 40px); overflow-y:auto; border-radius:12px }
-.quiz-main-area { flex:1; max-width:800px; margin:0 auto; background-color:var(--color-bg-container); border-radius:12px; box-shadow:var(--color-shadow-container); border:1px solid var(--color-border-container); box-sizing:border-box; color:var(--color-text-primary); padding:0 }
+.quiz-main-area { flex:1; max-width:800px; margin:0 auto; background-color:var(--color-bg-container); border-radius:12px; box-shadow:var(--color-shadow-container); border:1px solid var(--color-border-container); box-sizing:border-box; color:var(--color-text-primary); padding:0; contain:layout style }
 .quiz-container-loading { background-color:var(--color-bg-container); border-radius:12px; box-shadow:var(--color-shadow-container); border:1px solid var(--color-border-container); padding:40px 30px; box-sizing:border-box; width:90%; max-width:500px; margin:auto; color:var(--color-text-primary); display:flex; flex-direction:column; align-items:center; justify-content:center }
 .quiz-container-start { background-color:var(--color-bg-container); border-radius:12px; box-shadow:var(--color-shadow-container); border:1px solid var(--color-border-container); padding:40px 30px; width:90%; max-width:500px; margin:auto }
 .no-questions-text { text-align:center; color:var(--color-text-muted); padding:40px }

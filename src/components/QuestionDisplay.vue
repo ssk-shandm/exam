@@ -193,6 +193,7 @@ import type { Question, UserAnswer, AppMode, SubAnswer } from '../types'
 import ResultDisplay from './ResultDisplay.vue'
 import CompoundQuestion from './CompoundQuestion.vue'
 import { useQuizStore } from '../stores/quizStore'
+import { showToast } from '../composables/useToast'
 
 const quizStore = useQuizStore()
 
@@ -316,13 +317,13 @@ const isGuessedRight = computed(() =>
 function addToWrong() {
   if (props.bankFile && !quizStore.containsWrongEntry(props.question.number, props.bankFile)) {
     quizStore.addWrongEntry(props.question.number, props.bankFile)
+    showToast('已添加到错题本')
   }
 }
 
 function addGuessed() {
   if (props.bankFile) {
     // 同时标记为蒙对 + 加入错题本（确保错题本里有记录，去重）
-    console.log('[QuestionDisplay] addGuessed called with bankFile:', props.bankFile, 'q:', props.question.number)
     quizStore.addGuessedRight(props.question.number, props.bankFile)
     if (!quizStore.containsWrongEntry(props.question.number, props.bankFile)) {
       quizStore.addWrongEntry(props.question.number, props.bankFile)

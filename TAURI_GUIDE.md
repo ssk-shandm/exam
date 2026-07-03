@@ -83,19 +83,17 @@ npm run tauri:build
 
 每次改完代码发新版：
 
-```bash
-# 1. 更新版本号
-```
+1. 更新版本号：
+   - 改 `src-tauri/tauri.conf.json` 中的 `"version": "0.2.0"`
+   - 改 `src/composables/useVersion.ts` 中的 `APP_VERSION`
 
-1. 改 `src-tauri/tauri.conf.json` 中的 `"version": "0.2.0"`
-2. 改 `src/composables/useVersion.ts` 中的 `APP_VERSION`
+2. 重新构建：
 
-```bash
-# 2. 重新构建
-npm run tauri:build
-# 产物在 src-tauri/target/release/bundle/nsis/*.exe
-# 可直接发布 exe 到 GitHub Releases 或任意网盘
-```
+   ```bash
+   npm run tauri:build
+   ```
+
+   产物在 `src-tauri/target/release/bundle/nsis/*.exe`，可直接发布 exe 到 GitHub Releases 或任意网盘。
 
 ### 4.2 配置更新检查
 

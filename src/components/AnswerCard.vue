@@ -154,9 +154,6 @@ function getButtonClass(question: Question, index: number) {
 
   if (entry?.isCorrect === true) {
     const isGR = props.bankFile && quizStore.isGuessedRight(question.number, props.bankFile)
-    if (!isGR && props.bankFile) {
-      console.log('[AnswerCard] not guessed-right for q', question.number, 'bankFile:', props.bankFile)
-    }
     classes.push(props.appMode === 'wrong' ? 'correct' : (
       isGR ? 'guessed-right' : 'correct'
     ))

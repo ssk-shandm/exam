@@ -18,14 +18,8 @@ type AnswerSheetEntry = {
   subAnswers?: Map<number, SubAnswer>
 }
 
-/** 所有题库 */
-export const availableBanks = [
-  { name: '数据结构与算法题库', file: '/subjects/sjjg.json' },
-  { name: 'Java 基础题库', file: '/subjects/java.json' },
-  { name: 'Java 重要题库', file: '/subjects/java-important.json' },
-  { name: '数据库系统原理与应用', file: '/subjects/sjkxtylyyy.json' },
-  { name: '计算机组成与系统结构', file: '/subjects/计算机组成与系统结构.json' },
-]
+/** 所有题库（启动时从 banks.json 动态加载） */
+export const banks = ref<BankEntry[]>([])
 
 /** 题型别名映射 */
 const TYPE_ALIASES: Record<string, string[]> = {
@@ -73,15 +67,9 @@ export function useQuiz() {
   const answerSheet = ref(new Map<number, AnswerSheetEntry>())
   const renderError = ref('')
 
-  const currentBankFile = ref(availableBanks[1]?.file ?? '')
+  const currentBankFile = ref('')
   // 记住上次选择的题库
   const LAST_BANK_KEY = 'lastBank'
-  try {
-    const last = localStorage.getItem(LAST_BANK_KEY)
-    if (last && availableBanks.some((b) => b.file === last)) {
-      currentBankFile.value = last
-    }
-  } catch { /* 忽略 */ }
   const availableQuestionTypes = ref<string[]>([])
   const specializeTypes = ref<string[]>([])
   const shuffleEnabled = ref(false)
@@ -89,7 +77,7 @@ export function useQuiz() {
 
   // ── 导入的外部题库 ──
   const customBanks = ref<BankEntry[]>([])
-  const allBanks = computed(() => [...availableBanks, ...customBanks.value])
+  const allBanks = computed(() => [...banks.value, ...customBanks.value])
   /** 缓存已导入的题库内容，以便切换题库时重新加载 */
   const importedCache = new Map<string, Question[]>()
 
@@ -118,6 +106,27 @@ export function useQuiz() {
   }
 
   const QUIZ_MODES = ['practice', 'exam', 'endorse', 'wrong', 'specialize'] as const
+
+  // ── 题库清单加载 ──
+  async function loadBanks() {
+    try {
+      const resp = await fetch(`/subjects/banks.json?t=${Date.now()}`)
+      if (resp.ok) {
+        banks.value = (await resp.json()) as BankEntry[]
+      }
+    } catch (e) {
+      console.error('加载题库清单失败:', e)
+    }
+    // 根据上次选择或默认选中第一个
+    if (banks.value.length > 0) {
+      const last = localStorage.getItem(LAST_BANK_KEY)
+      if (last && banks.value.some((b) => b.file === last)) {
+        currentBankFile.value = last
+      } else {
+        currentBankFile.value = banks.value[0]!.file
+      }
+    }
+  }
 
   // ── 题库加载 ──
   async function loadQuestions(fileName: string = currentBankFile.value) {
@@ -508,43 +517,42 @@ export function useQuiz() {
     let count = 0
     let skippedExisting = 0
     let skippedCorrect = 0
-    // 为本次批量添加创建一个新笔记本（带时间戳，便于区分）
-    const now = new Date()
-    const timeStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`
-    const notebookName = `练习 ${timeStr}`
-    const nb = quizStore.createNotebook(notebookName, currentBankFile.value)
+    // 添加到当前活跃/默认错题本（与单题按钮同一个本），避免拆散错题。
+    const nb = quizStore.getOrCreateDefaultNotebook(currentBankFile.value)
     const notebookId = nb.id
+    // 仅在本错题本内去重（同本内不重复），不再跨错题本全局跳过。
+    const existingNumbers = new Set(
+      quizStore.getEntriesByNotebook(notebookId).map((e) => e.questionNumber),
+    )
 
     for (const q of shuffledQuestions.value) {
       const entry = answerSheet.value.get(q.number)
       if (entry?.userAnswer !== null && entry?.userAnswer !== undefined) {
         const canAdd = entry.isCorrect === false || entry.isCorrect === null
         if (canAdd) {
-          if (quizStore.containsWrongEntry(q.number, currentBankFile.value)) {
+          if (existingNumbers.has(q.number)) {
             skippedExisting++
           } else {
             quizStore.addWrongEntryToNotebook(q.number, currentBankFile.value, notebookId)
+            existingNumbers.add(q.number)
             count++
           }
         } else if (entry.isCorrect === true) {
           skippedCorrect++
         }
-        if (quizStore.isGuessedRight(q.number, currentBankFile.value) && !quizStore.containsWrongEntry(q.number, currentBankFile.value)) {
+        if (quizStore.isGuessedRight(q.number, currentBankFile.value) && !existingNumbers.has(q.number)) {
           quizStore.addWrongEntryToNotebook(q.number, currentBankFile.value, notebookId)
+          existingNumbers.add(q.number)
           count++
         }
       }
     }
     const parts: string[] = []
-    if (count > 0) parts.push(`已将 ${count} 道错题添加到新错题本「${notebookName}」`)
+    if (count > 0) parts.push(`已将 ${count} 道错题添加到错题本「${nb.name}」`)
     if (skippedExisting > 0) parts.push(`${skippedExisting} 道已在错题本中（跳过）`)
     if (skippedCorrect > 0) parts.push(`${skippedCorrect} 道回答正确（无需添加）`)
-    if (count === 0) {
-      // 没有添加任何题，删除刚创建的空笔记本
-      quizStore.deleteNotebook(notebookId)
-      if (parts.length === 0) {
-        parts.push('没有新的错题需要添加')
-      }
+    if (count === 0 && parts.length === 0) {
+      parts.push('没有新的错题需要添加')
     }
     showToast(parts.join('。') + '。')
   }
@@ -742,7 +750,8 @@ export function useQuiz() {
     } else { appMode.value = 'start' }
   }
 
-  onMounted(() => {
+  onMounted(async () => {
+    await loadBanks()
     loadQuestions()
     window.addEventListener('popstate', handlePopState)
   })
@@ -757,7 +766,7 @@ export function useQuiz() {
     // state
     isLoading, questions, shuffledQuestions, currentQuestionIndex, score, appMode, answerSheet,
     currentBankFile, availableQuestionTypes, specializeTypes,
-    shuffleEnabled, shufflePrefKey, wrongDisplayEntryIds, renderError,
+    shuffleEnabled, shufflePrefKey, wrongDisplayEntryIds, renderError, banks,
     // computed
     totalQuestions, wrongCount, allBanks,
     // actions
