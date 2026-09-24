@@ -115,6 +115,24 @@ Temperature、最大输出 Token、请求超时和 OCR 参数都通过 JSON conf
 
 可运行 `npm run config:check` 检查配置引用、Prompt 变量和示例文件。
 
+## AI 文档转换与图片管理
+
+设置页提供统一的文档转题库入口，支持 DOCX、PDF、XLSX/XLSM、TXT、Markdown、JSON 和 CSV。转换流程会先在本地提取文档内容，再调用已配置的 OpenAI 兼容模型，最后使用 JSON Schema 校验结果；校验失败时会自动请求模型修复。扫描版 PDF 会按页执行 OCR。
+
+转换 Prompt 会自动识别 Python、Java、JavaScript、SQL、命令行、配置片段和伪代码等内容，并将代码统一包裹为 Markdown fenced code block，写入题目的 `content` 或选项文本中，避免只能识别纯文字的模型破坏代码格式。
+
+DOCX 中的图片会在本地提取，并使用不带语义的数字编号，例如 `img-001.png`、`img-002.jpg`。文件名不需要让用户或模型理解，程序会结合图片锚点、原文顺序、附近文字和图片 manifest 自动把图片对应到题目；模型只能引用 manifest 中存在的图片路径。
+
+包含图片的题库导出包可解压到 `public/`，目录结构如下：
+
+```text
+subjects/<题库名>.json
+images/<题库名>/img-001.png
+images/<题库名>/img-002.jpg
+```
+
+本地题库、图片、凭据、构建目录、安装包和压缩包均已加入 `.gitignore`，不会误提交到代码仓库。
+
 ## 图表支持
 
 题目设置 `"format": "markdown"` 后，可直接使用 fenced code block：
@@ -146,6 +164,14 @@ npm run tauri:build
 ```
 
 桌面端错题数据保存为系统应用数据目录中的 `quiz-data.json`。
+
+Windows 安装包使用 `npm run tauri:build` 生成，输出目录为：
+
+```text
+src-tauri/target/release/bundle/nsis/
+```
+
+EXE 等发布产物已加入 `.gitignore`，不会提交到代码仓库。
 
 ## 🐳 Docker
 
