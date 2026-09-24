@@ -1,6 +1,7 @@
 {
   "$schema": "https://raw.githubusercontent.com/nicegui/tauri-v2-tauri/refs/heads/main/core/tauri-config-schema/schema.json",
-  "productName": "刷题助手",
+  "productName": "别卷",
+  "mainBinaryName": "别卷",
   "version": "0.1.0",
   "identifier": "com.exam.assistant",
   "build": {
@@ -12,7 +13,7 @@
   "app": {
     "windows": [
       {
-        "title": "刷题助手",
+        "title": "别卷",
         "width": 1200,
         "height": 800,
         "minWidth": 800,

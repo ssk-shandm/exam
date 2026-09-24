@@ -2,7 +2,7 @@
   <div class="about-page">
     <header class="about-header">
       <button class="back-btn" @click="emit('back')">← 返回设置</button>
-      <img class="app-mark" src="/app-icon.png" alt="刷题助手图标" />
+      <img class="app-mark" src="/app-icon.png" alt="别卷图标" />
       <h2>{{ APP_NAME }}</h2>
       <p>简洁、离线友好的刷题与错题复习工具</p>
     </header>
@@ -73,7 +73,7 @@ async function openLink(url: string) {
 .about-header h2 { margin: 12px 0 6px; }
 .about-header p { margin: 0; color: var(--color-text-muted); }
 .back-btn { position: absolute; left: 0; top: 0; padding: 7px 11px; border: 1px solid var(--color-border-btn-mode); border-radius: 7px; background: var(--color-bg-btn-secondary); color: var(--color-text-btn-secondary); cursor: pointer; }
-.app-mark { width: 68px; height: 68px; margin: 26px auto 0; display: block; object-fit: cover; border-radius: 18px; background: #fff; box-shadow: 0 8px 20px rgba(74,144,217,.28); }
+.app-mark { width: 68px; height: 68px; margin: 26px auto 0; display: block; object-fit: cover; border-radius: 20px; background: #fff; box-shadow: 0 8px 20px rgba(74,144,217,.28); }
 .about-list { margin: 28px 0 0; border-top: 1px solid var(--color-border-divider); }
 .about-list > div { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 16px; padding: 16px 4px; border-bottom: 1px solid var(--color-border-divider); }
 dt { color: var(--color-text-muted); }

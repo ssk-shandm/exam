@@ -1,4 +1,4 @@
-# 刷题助手 — 打包 exe 与更新指南
+# 别卷 — 打包 exe 与更新指南
 
 ## 项目结构
 
@@ -71,8 +71,8 @@ npm run tauri:build
 
 产物生成在：
 
-- **安装包（NSIS 安装器）：** `src-tauri/target/release/bundle/nsis/刷题助手_0.1.0_x64-setup.exe`
-- **便携版 exe：** `src-tauri/target/release/aaa.exe`
+- **安装包（NSIS 安装器）：** `src-tauri/target/release/bundle/nsis/别卷_0.1.0_x64-setup.exe`
+- **便携版 exe：** `src-tauri/target/release/别卷.exe`
 
 > ⚠️ Windows 上首次构建可能需要安装 **WebView2**（Win10+ 自带）和 **Visual Studio Build Tools**（C++ 编译环境）。如果构建报错提示 `Visual Studio` 相关，安装 [VS Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/) 并勾选“用 C++ 的桌面开发”。
 
@@ -113,7 +113,7 @@ npm run tauri:build
 ```json
 {
   "version": "0.2.0",
-  "downloadUrl": "https://example.com/downloads/刷题助手_0.2.0_x64-setup.exe",
+  "downloadUrl": "https://example.com/downloads/别卷_0.2.0_x64-setup.exe",
   "releaseNotes": "- 新增功能 xxx\n- 修复 xxx"
 }
 ```
@@ -151,7 +151,7 @@ const UPDATE_CHECK_URL = 'https://your-domain.com/version.json'
 }
 ```
 
-构建后会在 `bundle/nsis/` 下生成安装包。如果想单 exe 便携版，直接用 `target/release/aaa.exe`（但需要用户系统安装 WebView2）。
+构建后会在 `bundle/nsis/` 下生成安装包。如果想单 exe 便携版，直接用 `target/release/别卷.exe`（但需要用户系统安装 WebView2）。
 
 **Q: 如何更改应用窗口标题和尺寸？**
 
@@ -159,7 +159,7 @@ const UPDATE_CHECK_URL = 'https://your-domain.com/version.json'
 
 ```json
 "windows": [{
-  "title": "刷题助手",
+  "title": "别卷",
   "width": 1200,
   "height": 800,
   "minWidth": 800,

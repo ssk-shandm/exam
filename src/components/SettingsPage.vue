@@ -173,7 +173,7 @@
 
             <section class="settings-card about-detail">
               <header class="about-header">
-                <div class="about-mark" aria-hidden="true">卷</div>
+                <img class="about-mark" src="/app-icon.png" alt="别卷图标" />
                 <div>
                   <span class="section-label">应用信息</span>
                   <h3>{{ APP_NAME }}</h3>
@@ -908,14 +908,11 @@ async function openDownload() {
 .about-mark {
   width: 68px;
   height: 68px;
-  display: grid;
-  place-items: center;
+  display: block;
+  object-fit: cover;
   flex: 0 0 auto;
-  border-radius: 18px;
-  color: #fff;
-  font-size: 1.85rem;
-  font-weight: 800;
-  background: linear-gradient(135deg, #4a90d9, #7d5fff);
+  border-radius: 20px;
+  background: #fff;
   box-shadow: 0 8px 20px rgba(74, 144, 217, .22);
 }
 
@@ -1139,8 +1136,7 @@ async function openDownload() {
   .about-mark {
     width: 58px;
     height: 58px;
-    border-radius: 14px;
-    font-size: 1.55rem;
+    border-radius: 17px;
   }
 
   .card-actions,
