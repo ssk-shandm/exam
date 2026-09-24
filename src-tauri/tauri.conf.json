@@ -39,6 +39,10 @@
       "nsis": {
         "installMode": "perMachine"
       }
+    },
+    "resources": {
+      "../.tmp-build/public/subjects/": "public/subjects",
+      "../.tmp-build/public/images/": "public/images"
     }
   }
 }

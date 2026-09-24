@@ -1,78 +1,58 @@
 <template>
   <div id="result-container">
-    <p id="result-text" :class="resultTextClass">
-      {{ resultText }}
-    </p>
+    <p id="result-text" :class="resultTextClass">{{ resultText }}</p>
 
     <div v-if="!isCorrect && acceptedAlternatives.length && !isShortAnswer" class="accepted-alternatives">
       <p><strong>可接受的答案：</strong>{{ acceptedAlternatives.join('、') }}</p>
     </div>
 
-    <!-- 简答题 / Markdown 答案：显示参考答案块 -->
     <div v-if="showAnswerBlock" class="answer-block">
-      <p><strong>参考答案：</strong></p>
-      <div v-if="isMarkdownAnswer" class="markdown-answer-content" v-html="renderedAnswer"></div>
-      <p v-else class="plain-answer">{{ correctAnswer }}</p>
+      <p v-if="!isShortAnswer"><strong>参考答案：</strong></p>
+      <MarkdownContent
+        :class="isMarkdownAnswer ? 'markdown-answer-content' : 'plain-answer'"
+        :content="correctAnswer"
+        :format="answerFormat || 'text'"
+      />
     </div>
 
-    <p id="explanation-text" v-if="explanation">
-      {{ explanation }}
-    </p>
+    <div id="explanation-text" v-if="explanation">
+      <MarkdownContent :content="explanation" :format="explanationFormat || 'text'" />
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { renderMarkdown } from '../utils/markdown'
-import type { UserAnswer } from '../types'
+import type { ContentFormat, UserAnswer } from '../types'
+import MarkdownContent from './MarkdownContent.vue'
 
-const props = withDefaults(
-  defineProps<{
-    isCorrect: boolean
-    correctAnswer: string
-    explanation: string
-    userAnswer: UserAnswer
-    answerFormat?: 'text' | 'markdown'
-    codeLanguage?: string
-    /** 填空题多答案配置，用于展示可接受的替代答案 */
-    answerDetail?: { accepts: string[] }
-    /** 题目类型，用于简答题特殊处理 */
-    questionType?: string
-  }>(),
-  {
-    isCorrect: false,
-    answerFormat: undefined,
-    codeLanguage: undefined,
-    answerDetail: undefined,
-    questionType: undefined,
-  },
-)
-
-const isShortAnswer = computed(() => {
-  return props.questionType === '简答题' || props.questionType === '简答'
+const props = withDefaults(defineProps<{
+  isCorrect: boolean
+  correctAnswer: string
+  explanation: string
+  userAnswer: UserAnswer
+  answerFormat?: ContentFormat
+  explanationFormat?: ContentFormat
+  codeLanguage?: string
+  answerDetail?: { accepts: string[] }
+  questionType?: string
+}>(), {
+  isCorrect: false,
+  answerFormat: undefined,
+  explanationFormat: undefined,
+  codeLanguage: undefined,
+  answerDetail: undefined,
+  questionType: undefined,
 })
 
-const isMarkdownAnswer = computed(() => {
-  return props.answerFormat === 'markdown'
-})
+const isShortAnswer = computed(() => props.questionType === '简答题' || props.questionType === '简答')
+const isMarkdownAnswer = computed(() => props.answerFormat === 'markdown')
+const showAnswerBlock = computed(() => isMarkdownAnswer.value || isShortAnswer.value)
 
-const renderedAnswer = computed(() => {
-  if (!isMarkdownAnswer.value) return ''
-  return renderMarkdown(props.correctAnswer)
-})
-
-/** 简答题或 markdown 答案显示参考答案块 */
-const showAnswerBlock = computed(() => {
-  return isMarkdownAnswer.value || isShortAnswer.value
-})
-
-/** 答错时，展示所有可接受的答案 */
 const acceptedAlternatives = computed(() => {
   if (!props.answerDetail?.accepts?.length) return []
   const correctNormalized = props.correctAnswer.trim().toLowerCase()
-  return props.answerDetail.accepts.filter(
-    a => a.trim().toLowerCase() !== correctNormalized,
-  )
+  return props.answerDetail.accepts.filter((answer) => answer.trim().toLowerCase() !== correctNormalized)
 })
 
 const resultTextClass = computed(() => {
@@ -81,19 +61,12 @@ const resultTextClass = computed(() => {
 })
 
 const resultText = computed(() => {
-  if (isShortAnswer.value) {
-    return '你的回答已提交，请对照参考答案：'
-  }
-  if (props.isCorrect) {
-    return '回答正确！'
-  }
-  if (isMarkdownAnswer.value) {
-    return '回答错误。正确答案见下方代码块。'
-  }
+  if (isShortAnswer.value) return '参考回答：'
+  if (props.isCorrect) return '回答正确！'
+  if (isMarkdownAnswer.value) return '回答错误。正确答案见下方。'
   return `回答错误。正确答案: ${props.correctAnswer}。`
 })
 </script>
-
 <style scoped>
 #result-container {
   margin-top: 20px;

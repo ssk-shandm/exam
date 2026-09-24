@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "id": "question-bank-converter",
+  "displayName": "题库智能转换",
+  "description": "读取原始文本或导入文档，通过预装 Prompt 转换为刷题助手题库 JSON。",
+  "userConfigExample": "../examples/llm-user-config.example.json",
+  "userConfigSchema": "../schemas/llm-user-config.schema.json",
+  "outputSchema": "../schemas/question-bank.schema.json",
+  "input": {
+    "acceptedKinds": ["plain-text", "markdown", "docx-extracted-text", "ocr-text"],
+    "chunking": {
+      "enabled": true,
+      "maxCharacters": 12000,
+      "overlapCharacters": 300
+    }
+  },
+  "pipeline": [
+    {
+      "id": "convert",
+      "prompt": "prompts/question-bank-convert.prompt.json",
+      "required": true
+    },
+    {
+      "id": "repair",
+      "prompt": "prompts/question-bank-repair.prompt.json",
+      "when": "schema-validation-failed",
+      "maxAttempts": 2
+    }
+  ],
+  "output": {
+    "defaultDirectory": "../../subjects",
+    "fileNameTemplate": "{{bankName}}.json",
+    "prettyPrint": true,
+    "overwrite": false
+  }
+}

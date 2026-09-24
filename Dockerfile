@@ -9,7 +9,7 @@ RUN npm ci
 
 # 拷贝源码并构建（生成 dist/）
 COPY . .
-RUN npm run build-only
+RUN npm run prebuild && npm run build-only
 
 # ── 阶段 2：nginx 部署静态资源 ──
 FROM nginx:alpine

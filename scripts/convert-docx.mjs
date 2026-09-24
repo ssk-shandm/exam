@@ -8,8 +8,8 @@
  *   node scripts/convert-docx.mjs "C:\path\to\题目.docx" --dry-run
  *
  * 输出:
- *   public/<题库名>.json              — 题库 JSON
- *   public/images/<题库名>/imageN.png — 配图（如有）
+ *   public/subjects/<题库名>.json     — 题库 JSON
+ *   public/images/<题库名>/img-001.png — 配图（如有）
  *
  * 依赖: 系统需有 unzip 命令（Git Bash / WSL / macOS / Linux 均自带）
  */
@@ -22,6 +22,7 @@ import { fileURLToPath } from 'url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
 const PUBLIC = join(ROOT, 'public');
+const SUBJECTS = join(PUBLIC, 'subjects');
 const IMAGES = join(PUBLIC, 'images');
 
 // ── 参数解析 ──
@@ -52,7 +53,8 @@ if (!existsSync(docxPath)) {
 const nameIdx = args.indexOf('--name');
 const bankName = nameIdx !== -1 ? args[nameIdx + 1] : basename(docxPath).replace(/\.docx$/i, '');
 const dryRun = args.includes('--dry-run');
-const outputFile = join(PUBLIC, bankName + '.json');
+const safeBankName = safePathName(bankName);
+const outputFile = join(SUBJECTS, safeBankName + '.json');
 
 // ── 提取段落文本 ──
 function extractParagraphs(path) {
@@ -87,15 +89,17 @@ function extractImages(path) {
   mkdirSync(bankImagesDir, { recursive: true });
   const imgPaths = [];
 
-  for (const img of imageFiles) {
+  for (let index = 0; index < imageFiles.length; index += 1) {
+    const img = imageFiles[index];
     execSync(`unzip -o "${path}" "word/media/${img}" -d "${bankImagesDir}"`, {
       encoding: 'utf8', stdio: 'pipe',
     });
     const src = join(bankImagesDir, 'word', 'media', img);
-    const dest = join(bankImagesDir, img);
     if (existsSync(src)) {
-      renameSync(src, dest);
-      imgPaths.push('/images/' + safeName + '/' + img);
+      const imageName = buildImageName(img, index);
+      const imageDest = join(bankImagesDir, imageName);
+      renameSync(src, imageDest);
+      imgPaths.push('/images/' + safeBankName + '/' + imageName);
     }
   }
   // 清理 unzip 产生的目录结构
@@ -106,6 +110,19 @@ function extractImages(path) {
   return imgPaths;
 }
 
+function safePathName(value) {
+  return String(value || 'question-bank')
+    .replace(/[\\/:*?"<>|]+/g, '-')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '')
+    .slice(0, 80) || 'question-bank';
+}
+
+function buildImageName(originalName, index) {
+  const extension = originalName.match(/\.([^.]+)$/)?.[1]?.toLowerCase() || 'bin';
+  return `img-${String(index + 1).padStart(3, '0')}.${extension}`;
+}
 // ── 常量 ──
 const SECTION_RE = /^[一二三四五六七八九十]+、(.+)。$/;
 const TYPE_MAP = {
@@ -235,7 +252,7 @@ if (dryRun) {
 }
 
 // 写入 JSON
-mkdirSync(PUBLIC, { recursive: true });
+mkdirSync(SUBJECTS, { recursive: true });
 writeFileSync(outputFile, JSON.stringify(output, null, 2), 'utf8');
 console.log(`\n✅ 已生成: ${outputFile}`);
 console.log(`   共 ${output.length} 题`);
@@ -243,5 +260,5 @@ for (const [t, c] of Object.entries(stats)) console.log(`     ${t}: ${c}`);
 
 // 打印注册提示
 console.log(`\n📋 在 src/composables/useQuiz.ts 的 availableBanks 中添加:`);
-console.log(`  { name: '${bankName}', file: '/${bankName}.json' },`);
+console.log(`  { name: '${bankName}', file: '/subjects/${safeBankName}.json' },`);
 console.log(`\n🎉 完成！刷新页面即可看到新题库。\n`);

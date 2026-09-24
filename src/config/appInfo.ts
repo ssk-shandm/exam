@@ -1,0 +1,9 @@
+export const APP_NAME = '刷题助手'
+export const APP_VERSION_FALLBACK = '0.1.0'
+export const GITHUB_OWNER = 'ssk-shandm'
+export const GITHUB_REPO = 'exam'
+export const REPOSITORY_URL = `https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}`
+export const RELEASES_URL = `${REPOSITORY_URL}/releases/latest`
+export const LICENSE_NAME = 'MIT License'
+export const LICENSE_URL = `${REPOSITORY_URL}/blob/main/LICENSE`
+export const COPYRIGHT_LINE = 'Copyright © 2026 ssk-shandm'

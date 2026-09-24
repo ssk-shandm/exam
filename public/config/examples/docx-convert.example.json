@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "input": {
+    "path": "D:/题库/示例题库.docx",
+    "kind": "docx"
+  },
+  "bank": {
+    "name": "示例题库"
+  },
+  "conversion": {
+    "engine": "rule-based",
+    "dryRun": false,
+    "llm": {
+      "enabled": false,
+      "framework": "../llm/framework.json",
+      "promptId": "question-bank-convert",
+      "userConfig": "<appData>/llm-user-config.json"
+    }
+  },
+  "output": {
+    "questionBank": "public/subjects/<题库名称>.json",
+    "images": "public/images/<题库名称>/"
+  },
+  "usage": {
+    "currentCommand": "node scripts/convert-docx.mjs <docx文件路径> [--name <题库名称>] [--dry-run]",
+    "note": "当前脚本使用命令行参数；该 JSON 为后续统一转换器和 LLM 流水线预留。"
+  }
+}

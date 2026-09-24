@@ -1,3 +1,4 @@
+import DOMPurify from 'dompurify'
 import { marked } from 'marked'
 import { markedHighlight } from 'marked-highlight'
 import hljs from 'highlight.js/lib/core'
@@ -5,71 +6,82 @@ import java from 'highlight.js/lib/languages/java'
 import javascript from 'highlight.js/lib/languages/javascript'
 import sql from 'highlight.js/lib/languages/sql'
 
-// --- 注册 highlight.js 语言（集中管理，全局一次） ---
 hljs.registerLanguage('java', java)
 hljs.registerLanguage('javascript', javascript)
 hljs.registerLanguage('sql', sql)
-// 可按需添加更多语言：
-// import python from 'highlight.js/lib/languages/python'
-// hljs.registerLanguage('python', python)
 
-// --- 配置 marked 使用 highlight.js 进行代码块语法高亮 ---
+marked.setOptions({ gfm: true, breaks: true })
 marked.use(
   markedHighlight({
     langPrefix: 'hljs language-',
     highlight(code: string, lang: string) {
-      if (lang && hljs.getLanguage(lang)) {
-        return hljs.highlight(code, { language: lang }).value
-      }
-      // 未指定语言时自动检测
+      if (lang && hljs.getLanguage(lang)) return hljs.highlight(code, { language: lang }).value
       return hljs.highlightAuto(code).value
     },
   }),
 )
 
+export type DiagramType = 'mermaid' | 'plantuml'
+export interface DiagramBlock {
+  type: DiagramType
+  source: string
+}
+export interface MarkdownDocument {
+  html: string
+  diagrams: DiagramBlock[]
+}
+
+const DIAGRAM_FENCE = /```\s*(mermaid|plantuml|puml)\s*\r?\n([\s\S]*?)```/gi
+
 /**
- * 将 Markdown 字符串渲染为 HTML，代码块自动语法高亮。
- * 用于显示 answerFormat 为 'markdown' 的答案和解析。
+ * Markdown 安全渲染入口。图表代码先被抽离，普通 HTML 经 DOMPurify 清洗，
+ * Mermaid/PlantUML 再由 MarkdownContent 在隔离容器中渲染。
  */
-export function renderMarkdown(content: string): string {
-  if (content == null) return ''
+export function renderMarkdownDocument(content: string): MarkdownDocument {
+  const diagrams: DiagramBlock[] = []
+  const source = String(content ?? '').replace(DIAGRAM_FENCE, (_match, language: string, code: string) => {
+    const index = diagrams.length
+    diagrams.push({
+      type: language.toLowerCase() === 'mermaid' ? 'mermaid' : 'plantuml',
+      source: code.trim(),
+    })
+    return `\n<div class="diagram-placeholder" data-diagram-index="${index}" role="img" aria-label="${language} diagram"><span>正在渲染图表…</span></div>\n`
+  })
+
   try {
-    return marked.parse(content) as string
-  } catch (e) {
-    console.error('Markdown 渲染失败:', e)
-    return escapeHtml(content)
+    const html = marked.parse(source) as string
+    return {
+      html: DOMPurify.sanitize(html, {
+        ADD_ATTR: ['data-diagram-index', 'role', 'aria-label', 'target', 'rel'],
+      }),
+      diagrams,
+    }
+  } catch (error) {
+    console.error('Markdown 渲染失败:', error)
+    return { html: escapeHtml(source), diagrams }
   }
 }
 
-/**
- * 去除 Markdown 格式标记，用于答案比对。
- * 去除：代码围栏、行内代码、粗体/斜体、标题、HTML 标签。
- */
+
+/** 去除 Markdown 标记，用于答案比对。 */
 export function stripMarkdown(text: string): string {
   if (text == null) return ''
   let result = text
-  // 去除围栏代码块 (``` ... ```)
   result = result.replace(/```[\s\S]*?```/g, '')
-  // 去除行内代码反引号
   result = result.replace(/`([^`]+)`/g, '$1')
-  // 去除粗体 (**text**) 和斜体 (*text*)
   result = result.replace(/\*\*([^*]+)\*\*/g, '$1')
   result = result.replace(/\*([^*]+)\*/g, '$1')
-  // 去除 ATX 标题 (#, ##, 等)
   result = result.replace(/^#{1,6}\s+/gm, '')
-  // 去除 HTML 标签
   result = result.replace(/<[^>]+>/g, '')
   return result.trim()
 }
 
-/**
- * 简单的 HTML 转义，防止 XSS。
- */
-function escapeHtml(text: string): string {
+export function escapeHtml(text: string): string {
   if (text == null || text === '') return ''
   return text
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;')
 }

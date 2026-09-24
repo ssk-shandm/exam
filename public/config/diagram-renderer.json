@@ -1,0 +1,7 @@
+{
+
+  "plantUml": {
+    "enabled": true,
+    "server": "https://www.plantuml.com/plantuml/svg"
+  }
+}

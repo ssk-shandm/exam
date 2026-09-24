@@ -22,7 +22,7 @@ export function showToast(message: string): Promise<void> {
       id,
       message,
       isConfirm: false,
-      resolve: (() => { resolve() }) as any,
+      resolve: () => resolve(),
     })
   })
 }
@@ -44,9 +44,8 @@ export function showConfirm(message: string): Promise<boolean> {
 export function dismissToast(id: number) {
   const idx = toasts.value.findIndex(t => t.id === id)
   if (idx >= 0) {
-    const t = toasts.value[idx]
-    toasts.value.splice(idx, 1)
-    if (t.resolve) {
+    const t = toasts.value.splice(idx, 1)[0]
+    if (t?.resolve) {
       t.resolve(false) // 点击遮罩 = 取消
     }
   }
@@ -56,9 +55,8 @@ export function dismissToast(id: number) {
 export function confirmToast(id: number) {
   const idx = toasts.value.findIndex(t => t.id === id)
   if (idx >= 0) {
-    const t = toasts.value[idx]
-    toasts.value.splice(idx, 1)
-    if (t.resolve) {
+    const t = toasts.value.splice(idx, 1)[0]
+    if (t?.resolve) {
       t.resolve(true)
     }
   }

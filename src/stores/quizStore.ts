@@ -2,6 +2,7 @@ import { ref, watch } from 'vue'
 import { defineStore } from 'pinia'
 import type { Question, WrongQuestionEntry, WrongNotebook } from '../types'
 import { showToast } from '../composables/useToast'
+import { normalizeQuestionBank } from '../utils/questionSchema'
 
 const WRONG_ENTRIES_KEY = 'wrongEntriesDB'
 const NOTEBOOKS_KEY = 'wrongNotebooksDB'
@@ -9,9 +10,8 @@ const ACTIVE_NOTEBOOK_KEY = 'activeWrongNotebook'
 const GUESSED_KEY = 'guessedRightDB'
 
 // ── 合并持久化（单文件，像 public/subjects/ 一样） ──
-const COMBINED_FILE = 'wrong-notebooks/_all.json'
+const COMBINED_FILE = 'quiz-data.json'
 const COMBINED_LOCAL_KEY = 'wrongNotebookData_v2'
-const SYNC_API = '/api/wrong-notebooks/sync'
 
 // ── Tauri 文件持久化（比 localStorage 更可靠） ──
 let tauriDataDir: string | null = null
@@ -58,18 +58,7 @@ async function writeTauriFile(filename: string, content: string): Promise<void> 
   }
 }
 
-/** 从 Tauri 文件或 localStorage 读取数据 */
-function loadStorage(key: string, tauriFile: string): string | null {
-  // 优先从 localStorage 读取（兼容已有数据）
-  const local = localStorage.getItem(key)
-  return local || null
-}
-
-/** 保存数据到 localStorage 和 Tauri 文件 */
-function saveStorage(key: string, tauriFile: string, content: string) {
-  localStorage.setItem(key, content)
-  writeTauriFile(tauriFile, content).catch(() => {})
-}
+const tauriStorageReady = initTauriStorage()
 
 // ── 从旧版 localStorage 迁移 ──
 function migrateOldStorage() {
@@ -99,7 +88,7 @@ function migrateOldStorage() {
         const existing: WrongQuestionEntry[] = JSON.parse(localStorage.getItem(WRONG_ENTRIES_KEY) || '[]')
         localStorage.setItem(WRONG_ENTRIES_KEY, JSON.stringify([...existing, ...entries]))
       }
-    } catch (_) { /* 忽略 */ }
+    } catch { /* 忽略 */ }
     localStorage.removeItem(oldWrongKey)
   }
 
@@ -112,7 +101,7 @@ function migrateOldStorage() {
         const migrated = parsed.map((num: number) => ({ questionNumber: num, bankFile: '' }))
         localStorage.setItem(GUESSED_KEY, JSON.stringify(migrated))
       }
-    } catch (_) { /* 忽略 */ }
+    } catch { /* 忽略 */ }
   }
 
   // ── 迁移旧版 flat wrongEntriesDB → 笔记本结构 ──
@@ -149,7 +138,7 @@ function migrateOldStorage() {
           localStorage.setItem(NOTEBOOKS_KEY, JSON.stringify(notebooks))
           localStorage.setItem(WRONG_ENTRIES_KEY, JSON.stringify(allEntries))
         }
-      } catch (_) { /* 忽略 */ }
+      } catch { /* 忽略 */ }
     }
   }
 }
@@ -169,32 +158,32 @@ function genNotebookId(): string {
 }
 
 export const useQuizStore = defineStore('quiz', () => {
-  // 初始化 Tauri 文件存储
-  initTauriStorage().catch(() => {})
-
-  // ── 从多个来源加载初始数据 ──
-  // 优先级：Tauri 文件 > public/wrong-notebooks/data.json > localStorage>
+  // ── 加载初始数据：浏览器使用 localStorage，桌面端随后用 appData 单文件覆盖 ──
   let initialNotebooks: WrongNotebook[] = []
   let initialEntries: WrongQuestionEntry[] = []
   let initialActive: Record<string, string> = {}
   let initialGuessed: { questionNumber: number; bankFile: string }[] = []
 
-  // 尝试从 localStorage 读取（最快，作为即时后备）
+  // 浏览器只读取一个合并文档；没有时再兼容旧版分散键。
   try {
-    initialNotebooks = JSON.parse(localStorage.getItem(NOTEBOOKS_KEY) || '[]')
-    if (!Array.isArray(initialNotebooks)) initialNotebooks = []
-  } catch { initialNotebooks = [] }
-  try {
-    initialEntries = JSON.parse(localStorage.getItem(WRONG_ENTRIES_KEY) || '[]')
-    if (!Array.isArray(initialEntries)) initialEntries = []
-  } catch { initialEntries = [] }
-  try {
-    initialActive = JSON.parse(localStorage.getItem(ACTIVE_NOTEBOOK_KEY) || '{}')
-  } catch { initialActive = {} }
-  try {
-    initialGuessed = JSON.parse(localStorage.getItem(GUESSED_KEY) || '[]')
-    if (!Array.isArray(initialGuessed)) initialGuessed = []
-  } catch { initialGuessed = [] }
+    const combined = JSON.parse(localStorage.getItem(COMBINED_LOCAL_KEY) || 'null')
+    if (combined && Array.isArray(combined.notebooks) && Array.isArray(combined.wrongEntries)) {
+      initialNotebooks = combined.notebooks
+      initialEntries = combined.wrongEntries
+      initialActive = combined.activeNotebookByBank || {}
+      initialGuessed = combined.guessedRight || []
+    } else {
+      initialNotebooks = JSON.parse(localStorage.getItem(NOTEBOOKS_KEY) || '[]')
+      initialEntries = JSON.parse(localStorage.getItem(WRONG_ENTRIES_KEY) || '[]')
+      initialActive = JSON.parse(localStorage.getItem(ACTIVE_NOTEBOOK_KEY) || '{}')
+      initialGuessed = JSON.parse(localStorage.getItem(GUESSED_KEY) || '[]')
+    }
+  } catch {
+    initialNotebooks = []
+    initialEntries = []
+    initialActive = {}
+    initialGuessed = []
+  }
 
   // 以上述为后备值创建 ref
   const notebooks = ref<WrongNotebook[]>(initialNotebooks)
@@ -202,9 +191,10 @@ export const useQuizStore = defineStore('quiz', () => {
   const activeNotebookByBank = ref<Record<string, string>>(initialActive)
   const guessedRightBank = ref<{ questionNumber: number; bankFile: string }[]>(initialGuessed)
 
-  // ── 异步补充加载：从 Tauri 文件或 public/wrong-notebooks/ 加载（像题库一样，每个笔记本独立 JSON） ──
+  // ── 桌面端异步加载单文件数据；浏览器已同步读取 localStorage ──
   async function loadPersistedData() {
-    // 1) 优先从 Tauri appDataDir 加载（最持久）
+    await tauriStorageReady
+    // 桌面版优先从 appDataDir 的单文件读取。
     const tauriRaw = await readTauriFile(COMBINED_FILE)
     if (tauriRaw) {
       try {
@@ -222,46 +212,10 @@ export const useQuizStore = defineStore('quiz', () => {
       } catch (e) { console.warn('[quizStore] Tauri 数据解析失败:', e) }
     }
 
-    // 2) 尝试从 public/wrong-notebooks/ 加载（每个笔记本独立 JSON 文件）
-    try {
-      const idxResp = await fetch(`/wrong-notebooks/_index.json?t=${Date.now()}`)
-      if (idxResp.ok) {
-        const index = await idxResp.json()
-        if (index && Array.isArray(index.notebooks)) {
-          // 仅在 localStorage 为空时加载，否则 localStorage 优先（含用户最新操作）
-          if (wrongEntries.value.length === 0) {
-            const loadedNotebooks: WrongNotebook[] = []
-            const loadedEntries: WrongQuestionEntry[] = []
-            // 逐个获取每个笔记本的独立 JSON 文件
-            for (const nbInfo of index.notebooks) {
-              try {
-                const nbResp = await fetch(`${nbInfo.file}?t=${Date.now()}`)
-                if (nbResp.ok) {
-                  const nbData = await nbResp.json()
-                  if (nbData.notebook) loadedNotebooks.push(nbData.notebook)
-                  if (Array.isArray(nbData.entries)) loadedEntries.push(...nbData.entries)
-                }
-              } catch { /* 单个文件读取失败，跳过 */ }
-            }
-            if (loadedNotebooks.length > 0) {
-              notebooks.value = loadedNotebooks
-              wrongEntries.value = loadedEntries
-              activeNotebookByBank.value = index.activeNotebookByBank || {}
-              guessedRightBank.value = index.guessedRight || []
-              const maxId = loadedEntries.reduce((m: number, e: { id: number }) => Math.max(m, e.id), 0)
-              nextId = Math.max(nextId, maxId + 1)
-              console.log('[quizStore] 已从 public/wrong-notebooks/ 加载', loadedNotebooks.length, '个错题本')
-            }
-          }
-          return
-        }
-      }
-    } catch { /* public 文件可能不存在，忽略 */ }
   }
-  // 在 store 创建后异步执行
-  setTimeout(() => loadPersistedData().catch(() => {}), 100)
+  void loadPersistedData()
 
-  // ── 合并持久化：写全部数据到 Tauri 文件（桌面）或 Vite API（浏览器）+ localStorage ──
+  // ── 合并持久化：浏览器 localStorage + 桌面 appData 单文件 ──
   function saveCombinedData() {
     const data = {
       version: 1,
@@ -272,22 +226,8 @@ export const useQuizStore = defineStore('quiz', () => {
       guessedRight: guessedRightBank.value,
     }
     const json = JSON.stringify(data)
-    // 写 Tauri 文件（桌面版）
-    writeTauriFile(COMBINED_FILE, json).catch(() => {})
-    // 写 localStorage
     localStorage.setItem(COMBINED_LOCAL_KEY, json)
-    localStorage.setItem(NOTEBOOKS_KEY, JSON.stringify(notebooks.value))
-    localStorage.setItem(WRONG_ENTRIES_KEY, JSON.stringify(wrongEntries.value))
-    localStorage.setItem(ACTIVE_NOTEBOOK_KEY, JSON.stringify(activeNotebookByBank.value))
-    localStorage.setItem(GUESSED_KEY, JSON.stringify(guessedRightBank.value))
-    // 浏览器模式：通过 Vite API 写入 public/wrong-notebooks/（每个笔记本独立 JSON）
-    if (!tauriWriteAvailable) {
-      fetch(SYNC_API, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: json,
-      }).catch(() => { /* dev server 不可用时静默失败 */ })
-    }
+    void tauriStorageReady.then(() => writeTauriFile(COMBINED_FILE, json))
   }
 
   // 所有数据变化共享一个防抖 watch
@@ -345,24 +285,33 @@ export const useQuizStore = defineStore('quiz', () => {
     return [...notebooks.value]
   }
 
-  /** 获取或创建默认笔记本 */
+  /** 获取或创建默认笔记本
+   *  仅返回当前活跃的笔记本；若该题库无活跃笔记本则新建一个。
+   *  这样每次「重置后再做」都会得到一个新错题本，避免追加到旧本。
+   *  新建时自动加序号 (2)、(3)... 防止同名混淆。
+   */
   function getOrCreateDefaultNotebook(bankFile: string): WrongNotebook {
-    const existing = notebooks.value.filter((n) => n.bankFile === bankFile)
-    if (existing.length > 0) {
-      // 优先返回活跃的
-      const activeId = activeNotebookByBank.value[bankFile]
-      if (activeId) {
-        const active = existing.find((n) => n.id === activeId)
-        if (active) return active
-      }
-      return existing[0]
+    const activeId = activeNotebookByBank.value[bankFile]
+    if (activeId) {
+      const active = notebooks.value.find((n) => n.id === activeId && n.bankFile === bankFile)
+      if (active) return active
     }
-    return createNotebook(bankFile + ' 错题本', bankFile)
+    const baseName = bankFile + ' 错题本'
+    const existing = notebooks.value.filter((n) => n.bankFile === bankFile)
+    const name = existing.length > 0 ? `${baseName} (${existing.length + 1})` : baseName
+    return createNotebook(name, bankFile)
   }
 
   /** 设置活跃笔记本 */
   function setActiveNotebook(bankFile: string, notebookId: string) {
     activeNotebookByBank.value[bankFile] = notebookId
+  }
+
+  /** 清除指定题库的活跃笔记本标记（重置做题进度时调用）。
+   *  下次「添加到错题本」时会新建一个笔记本，而不是追加到旧本。
+   */
+  function clearActiveNotebook(bankFile: string) {
+    delete activeNotebookByBank.value[bankFile]
   }
 
   /** 获取当前活跃的笔记本 */
@@ -417,10 +366,17 @@ export const useQuizStore = defineStore('quiz', () => {
     return getEntriesByNotebook(nb.id)
   }
 
-  /** 判断指定题库中是否有某题号的错题记录 */
+  /** 判断指定题库的活跃错题本中是否已包含某题号。
+   *  仅检查当前活跃错题本（无活跃标记则返回 false，不走 fallback），
+   *  与「添加到错题本」按钮的按本去重语义一致：
+   *  重置做题进度后活跃标记被清除，此函数返回 false，单题按钮恢复为「添加到错题」可点状态，
+   *  从而允许把已添加到旧错题本的题重新加入新建的错题本。
+   */
   function containsWrongEntry(questionNumber: number, bankFile: string): boolean {
+    const activeId = activeNotebookByBank.value[bankFile]
+    if (!activeId) return false
     return wrongEntries.value.some(
-      (e) => e.questionNumber === questionNumber && e.bankFile === bankFile,
+      (e) => e.questionNumber === questionNumber && e.notebookId === activeId,
     )
   }
 
@@ -479,7 +435,7 @@ export const useQuizStore = defineStore('quiz', () => {
   // ── 导入导出 ──
 
   /** 导出指定笔记本的错题为 JSON 文件 */
-  function exportNotebook(notebookId: string, allQuestions: Question[], defaultBankFile: string) {
+  function exportNotebook(notebookId: string, allQuestions: Question[]) {
     const entries = getEntriesByNotebook(notebookId)
     if (entries.length === 0) {
       showToast('该错题本是空的！')
@@ -515,7 +471,7 @@ export const useQuizStore = defineStore('quiz', () => {
   function exportWrongQuestions(allQuestions: Question[], bankFile: string) {
     const nb = getActiveNotebook(bankFile)
     if (!nb) { showToast('当前题库没有错题本！'); return }
-    exportNotebook(nb.id, allQuestions, bankFile)
+    exportNotebook(nb.id, allQuestions)
   }
 
   /** 导入错题到新笔记本 */
@@ -557,7 +513,7 @@ export const useQuizStore = defineStore('quiz', () => {
     reader.onload = (e) => {
       try {
         const content = e.target?.result as string
-        const importedQuestions = JSON.parse(content) as Question[]
+        const importedQuestions = normalizeQuestionBank(JSON.parse(content), file.name)
 
         if (
           !Array.isArray(importedQuestions) ||
@@ -652,6 +608,7 @@ export const useQuizStore = defineStore('quiz', () => {
     getAllNotebooks,
     getOrCreateDefaultNotebook,
     setActiveNotebook,
+    clearActiveNotebook,
     getActiveNotebook,
     getEntriesByNotebook,
     clearEntriesByNotebook,

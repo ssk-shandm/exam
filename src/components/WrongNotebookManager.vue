@@ -13,7 +13,7 @@
     </div>
     <div class="wm-actions wm-backup-actions">
       <button @click="$emit('backupAll')" class="mode-btn backup-btn">💾 备份全部错题本数据</button>
-      <button @click="$refs.restoreInput.click()" class="mode-btn restore-btn">📂 恢复全部错题本数据</button>
+      <button @click="triggerRestore" class="mode-btn restore-btn">📂 恢复全部错题本数据</button>
       <input type="file" ref="restoreInput" @change="$emit('restoreAll', $event)" style="display:none" accept=".json" />
     </div>
 
@@ -29,12 +29,30 @@
         class="wm-nb-card"
         :class="{ active: nb.id === activeId }"
       >
-        <div class="wm-nb-info" @click="$emit('setActive', nb.id)">
-          <span class="wm-nb-name">{{ nb.name }}</span>
-          <span class="wm-nb-count">（{{ entryCounts[nb.id] || 0 }} 道错题）</span>
-          <span class="wm-nb-date">{{ formatDate(nb.createdAt) }}</span>
+        <div class="wm-nb-info" @click="editingId !== nb.id && $emit('setActive', nb.id)">
+          <template v-if="editingId === nb.id">
+            <input
+              v-model="editName"
+              class="wm-nb-rename-input"
+              @keydown.enter="confirmEdit()"
+              @keydown.esc="cancelEdit()"
+              @blur="confirmEdit()"
+              @click.stop
+            />
+          </template>
+          <template v-else>
+            <span class="wm-nb-name">{{ nb.name }}</span>
+            <span class="wm-nb-count">（{{ entryCounts[nb.id] || 0 }} 道错题）</span>
+            <span class="wm-nb-date">{{ formatDate(nb.createdAt) }}</span>
+          </template>
         </div>
         <div class="wm-nb-actions">
+          <button
+            v-if="editingId !== nb.id"
+            @click="startEdit(nb)"
+            class="btn-edit"
+            title="重命名"
+          >✏️</button>
           <button @click="$emit('startPractice', nb.id)" class="mode-btn practice-btn">开始练习</button>
           <button @click="$emit('delete', nb.id)" class="btn-delete" title="删除该错题本">✕</button>
         </div>
@@ -51,10 +69,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, nextTick } from 'vue'
 import type { WrongNotebook } from '../types'
 
 const restoreInput = ref<HTMLInputElement | null>(null)
+
+function triggerRestore() {
+  restoreInput.value?.click()
+}
 
 defineProps<{
   notebooks: WrongNotebook[]
@@ -66,7 +88,7 @@ defineProps<{
   entryCounts: Record<string, number>
 }>()
 
-defineEmits<{
+const emit = defineEmits<{
   back: []
   import: []
   export: []
@@ -75,7 +97,33 @@ defineEmits<{
   setActive: [notebookId: string]
   startPractice: [notebookId: string]
   delete: [notebookId: string]
+  rename: [notebookId: string, newName: string]
 }>()
+
+const editingId = ref<string | null>(null)
+const editName = ref('')
+
+function startEdit(nb: WrongNotebook) {
+  editingId.value = nb.id
+  editName.value = nb.name
+  nextTick(() => {
+    const input = document.querySelector<HTMLInputElement>('.wm-nb-rename-input')
+    input?.focus()
+    input?.select()
+  })
+}
+
+function confirmEdit() {
+  if (editingId.value && editName.value.trim()) {
+    emit('rename', editingId.value, editName.value.trim())
+  }
+  cancelEdit()
+}
+
+function cancelEdit() {
+  editingId.value = null
+  editName.value = ''
+}
 
 function formatDate(ts: number) {
   return new Date(ts).toLocaleDateString('zh-CN')
@@ -184,11 +232,29 @@ function formatDate(ts: number) {
   background: var(--color-bg-btn-primary) !important;
   color: var(--color-text-btn-primary) !important;
 }
+.btn-edit {
+  background: none; border: none; color: var(--color-text-muted);
+  cursor: pointer; font-size: 0.9rem; padding: 4px 6px; border-radius: 4px;
+  opacity: 0.5; transition: opacity 0.15s;
+}
+.wm-nb-card:hover .btn-edit { opacity: 1; }
+.btn-edit:hover { color: var(--color-accent); background: rgba(74,144,217,0.1); }
 .btn-delete {
   background: none; border: none; color: var(--color-text-muted);
   cursor: pointer; font-size: 1rem; padding: 4px 8px; border-radius: 4px;
 }
 .btn-delete:hover { color: #e74c3c; background: rgba(231,76,60,0.1); }
+.wm-nb-rename-input {
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 3px 8px;
+  border: 2px solid var(--color-accent);
+  border-radius: 4px;
+  background: var(--color-bg-input);
+  color: var(--color-text-primary);
+  width: 200px;
+  outline: none;
+}
 .wm-quick-start {
   text-align: center;
   padding-top: 16px;
@@ -209,5 +275,18 @@ function formatDate(ts: number) {
   cursor: pointer;
   background-color: var(--color-bg-btn-secondary);
   color: var(--color-text-btn-secondary);
+}
+
+@media (max-width: 600px) {
+  .wrong-manage-page {
+    width: 100%;
+    margin: 0 auto;
+    padding: 16px;
+    border-radius: 0;
+  }
+  .wm-actions { flex-wrap: wrap; }
+  .wm-nb-card { flex-wrap: wrap; }
+  .wm-nb-actions { flex-wrap: wrap; justify-content: flex-end; }
+  .wm-nb-rename-input { width: 100%; }
 }
 </style>

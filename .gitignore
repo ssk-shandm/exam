@@ -57,10 +57,51 @@ public/subjects/*
 # 题目图片
 public/images/*
 !public/images/.gitkeep
-# 错题本（运行时生成，纯用户数据）
-public/wrong-notebooks/*
-!public/wrong-notebooks/.gitkeep
+!public/images/README.md
 
 # 复习资料与临时文档
 计算机组成原理-综合复习.md
 tmp/
+tmp_docx/
+.tmp-build/
+
+# LLM 本地凭据（真实 API Key 不入库）
+llm-user-config.json
+*.llm.local.json
+
+# Environment variables and local credentials
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.pem
+*.key
+*.crt
+
+# Local question banks, images, and wrong-answer notebooks
+public/wrong-notebooks/*
+!public/wrong-notebooks/.gitkeep
+
+# Frontend and Tauri generated release artifacts
+.vite/
+.tauri/
+src-tauri/target/**
+*.msi
+*.nsis.zip
+*.dmg
+*.deb
+*.rpm
+*.AppImage
+*.appimage
+*.pdb
+*.dSYM/
+
+# Temporary archives and exported files
+*.zip
+*.7z
+*.rar
+*.tar
+*.gz
+
+# Local ad-hoc browser test scripts
+test-reset*.mjs

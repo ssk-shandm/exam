@@ -1,0 +1,91 @@
+[
+  {
+    "id": "single-001",
+    "number": 1,
+    "type": "single",
+    "content": "HTTP 的默认端口是什么？",
+    "format": "text",
+    "options": { "A": "21", "B": "80", "C": "443", "D": "8080" },
+    "answer": "B",
+    "explanation": "HTTP 默认使用 80 端口。",
+    "wrongDescription": "容易把 HTTP 的 80 端口与 HTTPS 的 443 端口混淆。"
+  },
+  {
+    "id": "multiple-001",
+    "number": 2,
+    "type": "multiple",
+    "content": "以下哪些是关系型数据库？",
+    "options": { "A": "PostgreSQL", "B": "MySQL", "C": "Redis", "D": "SQLite" },
+    "answer": ["A", "B", "D"],
+    "explanation": "Redis 通常作为键值数据库使用。"
+  },
+  {
+    "id": "true-false-001",
+    "number": 3,
+    "type": "true-false",
+    "content": "HTTPS 默认端口是 443。",
+    "answer": true,
+    "explanation": "判断题也接受 A/B、true/false、正确/错误。"
+  },
+  {
+    "id": "fill-001",
+    "number": 4,
+    "type": "fill",
+    "content": "CSS 的全称是 ______。",
+    "answer": "Cascading Style Sheets",
+    "answerDetail": { "accepts": ["Cascading Style Sheets", "cascading style sheets"] }
+  },
+  {
+    "id": "markdown-mermaid-001",
+    "number": 5,
+    "type": "single",
+    "content": "阅读流程图：\n\n```mermaid\nflowchart LR\n  A[开始] --> B{条件成立?}\n  B -->|是| C[完成]\n  B -->|否| D[重试]\n```\n\n哪条边表示成功路径？",
+    "format": "markdown",
+    "options": { "A": "B 到 C", "B": "B 到 D" },
+    "answer": "A",
+    "explanation": "Mermaid 在浏览器本地渲染，不会把图表源码发送到远程服务。"
+  },
+  {
+    "id": "markdown-plantuml-001",
+    "number": 6,
+    "type": "short-answer",
+    "content": "分析下面的时序图：\n\n```plantuml\n@startuml\nAlice -> Bob: Hello\nBob --> Alice: Hi\n@enduml\n```",
+    "format": "markdown",
+    "answer": "Alice 向 Bob 发送 Hello，Bob 回复 Hi。",
+    "answerFormat": "markdown",
+    "explanation": "PlantUML 图由 diagram-renderer.json 指定的服务器生成。"
+  },
+  {
+    "id": "compound-001",
+    "number": 7,
+    "type": "compound",
+    "content": "根据场景完成子题。",
+    "format": "markdown",
+    "scenario": "给定表 `users(id, name, active)`。",
+    "subQuestions": [
+      {
+        "id": 1,
+        "type": "single",
+        "content": "哪个字段适合作为主键？",
+        "options": { "A": "id", "B": "name" },
+        "answer": "A"
+      },
+      {
+        "id": 2,
+        "type": "fill",
+        "content": "查询启用用户：`SELECT * FROM users WHERE active = ____;`",
+        "answer": "1",
+        "answerDetail": { "accepts": ["1", "TRUE", "true"] }
+      },
+      {
+        "id": 3,
+        "type": "short-answer",
+        "content": "写出按 id 倒序查询的 SQL。",
+        "answer": "```sql\nSELECT * FROM users ORDER BY id DESC;\n```",
+        "answerFormat": "markdown"
+      }
+    ],
+    "answer": "",
+    "explanation": "复合题由各子题分别提交和判分。"
+  }
+]

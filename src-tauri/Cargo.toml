@@ -2,7 +2,9 @@
 name = "aaa"
 version = "0.1.0"
 description = "刷题助手 - A quiz practice application"
-authors = ["developer"]
+authors = ["ssk-shandm"]
+license = "MIT"
+repository = "https://github.com/ssk-shandm/exam"
 edition = "2021"
 
 [lib]

@@ -1,0 +1,24 @@
+{
+  "$schema": "../public/config/schemas/llm-user-config.schema.json",
+  "schemaVersion": 1,
+  "provider": {
+    "protocol": "openai-compatible",
+    "baseUrl": "https://api.example.com/v1",
+    "model": ""
+  },
+  "request": {
+    "temperature": 0.1,
+    "maxOutputTokens": 8192,
+    "timeoutMs": 120000
+  },
+  "ocr": {
+    "enabled": true,
+    "language": "chi_sim+eng",
+    "scale": 1.8,
+    "minTextCharacters": 40
+  },
+  "privacy": {
+    "allowRemoteProcessing": false,
+    "confirmBeforeSending": true
+  }
+}

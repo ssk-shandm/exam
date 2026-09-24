@@ -1,15 +1,11 @@
 import { ref } from 'vue'
+import {
+  APP_VERSION_FALLBACK,
+  GITHUB_OWNER,
+  GITHUB_REPO,
+  RELEASES_URL,
+} from '../config/appInfo'
 
-/** 当前应用版本 — 与 src-tauri/tauri.conf.json 中的 version 保持同步 */
-const APP_VERSION = '0.1.0'
-
-// ============================================================
-//  👇 改成你自己的 GitHub 信息（仓库设为 public）
-// ============================================================
-const GITHUB_OWNER = 'ssk-shandm'
-const GITHUB_REPO = 'exam'
-
-/** GitHub API 最新 Release 地址（无需 token，公开仓库 60次/小时） */
 const GITHUB_API_URL = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/releases/latest`
 
 interface RemoteVersion {
@@ -19,50 +15,62 @@ interface RemoteVersion {
 }
 
 export function useVersion() {
-  const version = ref(APP_VERSION)
+  const version = ref(APP_VERSION_FALLBACK)
   const isUpdating = ref(false)
   const updateInfo = ref<RemoteVersion | null>(null)
   const updateError = ref('')
+  let versionPromise: Promise<void> | null = null
 
-  /**
-   * 检查更新：通过 GitHub Releases API 获取最新版本
-   */
+  function resolveAppVersion() {
+    if (versionPromise) return versionPromise
+    versionPromise = (async () => {
+      const isTauri = typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window
+      if (!isTauri) return
+      try {
+        const { invoke } = await import('@tauri-apps/api/core')
+        const desktopVersion = await invoke<string>('get_app_version')
+        if (desktopVersion) version.value = desktopVersion
+      } catch (error) {
+        console.warn('读取桌面应用版本失败，使用内置版本号：', error)
+      }
+    })()
+    return versionPromise
+  }
+
+  void resolveAppVersion()
+
+  /** 通过 GitHub Releases API 获取最新版本。 */
   async function checkUpdate() {
     isUpdating.value = true
     updateInfo.value = null
     updateError.value = ''
 
     try {
-      const res = await fetch(GITHUB_API_URL)
+      await resolveAppVersion()
+      const res = await fetch(GITHUB_API_URL, {
+        headers: { Accept: 'application/vnd.github+json' },
+      })
       if (!res.ok) {
-        if (res.status === 403) {
-          throw new Error('GitHub API 频率限制，稍后再试')
-        }
-        if (res.status === 404) {
-          throw new Error('未找到 Release，请先在 GitHub 上创建发布')
-        }
-        throw new Error(`HTTP ${res.status}`)
+        if (res.status === 403) throw new Error('GitHub API 访问频率受限，请稍后再试')
+        if (res.status === 404) throw new Error('仓库暂未发布 Release')
+        throw new Error(`检查更新失败（HTTP ${res.status}）`)
       }
 
       const data = await res.json()
+      const remoteVersion = String(data.tag_name ?? '').replace(/^v/i, '')
+      if (!remoteVersion) throw new Error('最新 Release 缺少版本标签')
 
-      // GitHub API 返回的 tag_name 通常是 "v0.2.0" 格式
-      const remoteTag: string = data.tag_name ?? ''
-      // 提取版本号（去掉开头的 v）
-      const remoteVersion = remoteTag.replace(/^v/i, '')
-      const current = version.value
-
-      if (compareVersions(remoteVersion, current) > 0) {
+      if (compareVersions(remoteVersion, version.value) > 0) {
         updateInfo.value = {
           version: remoteVersion,
-          downloadUrl: data.html_url ?? `https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/releases/latest`,
+          downloadUrl: data.html_url ?? RELEASES_URL,
           releaseNotes: data.body ?? '',
         }
       } else {
         updateError.value = 'already-latest'
       }
-    } catch (e) {
-      updateError.value = e instanceof Error ? e.message : '网络错误'
+    } catch (error) {
+      updateError.value = error instanceof Error ? error.message : '网络错误'
     } finally {
       isUpdating.value = false
     }
@@ -83,10 +91,9 @@ export function useVersion() {
   }
 }
 
-/** 简单的 semver 比较 */
 function compareVersions(a: string, b: string): number {
-  const pa = a.split('.').map(Number)
-  const pb = b.split('.').map(Number)
+  const pa = a.split('.').map((part) => Number.parseInt(part, 10) || 0)
+  const pb = b.split('.').map((part) => Number.parseInt(part, 10) || 0)
   for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
     const na = pa[i] ?? 0
     const nb = pb[i] ?? 0

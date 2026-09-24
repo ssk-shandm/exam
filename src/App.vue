@@ -13,8 +13,19 @@
     :selected-bank="currentBankFile"
     :question-types="availableQuestionTypes"
     @changeBank="handleBankChange"
-    :on-import-bank="importExternalBank"
     class="quiz-container-start"
+  />
+
+  <SettingsPage
+    v-else-if="appMode === 'settings'"
+    key="settings"
+    @back="handleBackToHome"
+  />
+
+  <AboutPage
+    v-else-if="appMode === 'about'"
+    key="about"
+    @back="handleBackToSettings"
   />
 
   <!-- 错题本管理页面 -->
@@ -33,6 +44,7 @@
     @set-active="(id: string) => quizStore.setActiveNotebook(currentBankFile, id)"
     @start-practice="(id: string) => { quizStore.setActiveNotebook(currentBankFile, id); handleStartGame('wrong'); }"
     @delete="deleteNotebookById"
+    @rename="(id: string, name: string) => quizStore.renameNotebook(id, name)"
     @backup-all="handleBackupAll"
     @restore-all="handleRestoreAll"
   />
@@ -68,15 +80,17 @@
           @toggleShuffle="handleToggleShuffle"
           @addToWrongBook="handleAddToWrongBook"
           @clearWrong="handleClearWrong"
+          @clearWrongAnswers="handleClearWrongAnswers"
           @exportWrong="exportWrongQuestions"
         />
         <div
           v-for="(question, index) in shuffledQuestions"
-          :key="question.number + '-' + index"
+          :key="question.number"
           :id="'q-' + question.number"
           class="question-list-item"
         >
           <QuestionDisplay
+            v-if="index >= windowStart && index <= windowEnd"
             :question="question"
             :question-number="index + 1"
             :total-questions="totalQuestions"
@@ -93,6 +107,11 @@
             :bank-file="currentBankFile"
             :wrong-entry-id="wrongDisplayEntryIds[index] ?? 0"
           />
+          <div v-else class="question-placeholder">
+            <span class="placeholder-idx">{{ index + 1 }}.</span>
+            <span class="placeholder-type">{{ question.type }}</span>
+            <span class="placeholder-text">{{ question.question }}</span>
+          </div>
         </div>
         <div class="list-nav" v-if="appMode === 'exam'">
           <button @click="submitExam" class="submit-exam-btn">提交试卷</button>
@@ -169,6 +188,8 @@
 <script setup lang="ts">
 import { onErrorCaptured, ref, computed } from 'vue'
 import StartScreen from './components/StartScreen.vue'
+import SettingsPage from './components/SettingsPage.vue'
+import AboutPage from './components/AboutPage.vue'
 import WrongNotebookManager from './components/WrongNotebookManager.vue'
 import AnswerCard from './components/AnswerCard.vue'
 import QuestionDisplay from './components/QuestionDisplay.vue'
@@ -193,10 +214,26 @@ const {
   handleAnswerUpdate, handleSubmit, handleCompoundSubmit, handleSubSubmit,
   handleToggleShuffle, handleClearPractice, handleAddToWrongBook, handleClearWrong,
   handleJumpTo, submitExam, exportWrongQuestions, importWrongQuestions, handleFileImport,
-  allBanks, importExternalBank,
+  allBanks,
   showImportDialog, importDialogNewNotebookName, pendingImportQuestions,
   confirmImportToNew, confirmImportToExisting, cancelImport,
+  handleClearWrongAnswers,
 } = q
+
+// ── 窗口化渲染：所有题目容器 div 保留（维持自然滚动），但只有当前题前2后4渲染 QuestionDisplay 组件 ──
+const BEFORE_WINDOW = 2
+const AFTER_WINDOW = 4
+
+const windowStart = computed(() => Math.max(0, currentQuestionIndex.value - BEFORE_WINDOW))
+const windowEnd = computed(() => Math.min(shuffledQuestions.value.length - 1, currentQuestionIndex.value + AFTER_WINDOW))
+
+function handleBackToSettings() {
+  if (window.history.state?.mode === 'about') {
+    window.history.back()
+  } else {
+    appMode.value = 'settings'
+  }
+}
 
 // ── 导入对话框 ──
 const importDialogChoice = ref<'new' | 'existing'>('new')
@@ -238,7 +275,7 @@ function doConfirmImport() {
 /** 当前活跃错题本名称（用于 wrong 模式 Toolbar 显示） */
 const activeNotebookName = computed(() => {
   const nb = quizStore.getActiveNotebook(currentBankFile.value)
-  return nb?.name || null
+  return nb?.name || undefined
 })
 
 /** 当前活跃错题本 id */
@@ -309,7 +346,7 @@ async function handleRestoreAll(event: Event) {
   inp.value = ''
 }
 
-onErrorCaptured((err) => { console.error(err); renderError.value = String(err); return false })
+onErrorCaptured((err) => { console.error('[渲染错误]', err, err?.stack); renderError.value = String(err) + (err?.stack ? '\n' + err.stack : ''); return false })
 </script>
 
 <style scoped>
@@ -321,7 +358,39 @@ onErrorCaptured((err) => { console.error(err); renderError.value = String(err); 
 .no-questions-text { text-align:center; color:var(--color-text-muted); padding:40px }
 .list-nav { margin-top:30px; padding-top:20px; border-top:1px solid var(--color-border-divider) }
 .submit-exam-btn { width:100%; padding:14px; font-size:1.1rem; font-weight:bold; color:var(--color-text-btn-success); background:var(--color-bg-btn-success); border:none; border-radius:8px; cursor:pointer }
-.question-list-item { margin-bottom:20px; padding-bottom:20px; border-bottom:1px solid var(--color-border-divider) }
+.question-list-item { margin-bottom:20px; padding-bottom:20px; border-bottom:1px solid var(--color-border-divider); scroll-margin-top:20px }
+
+/* 非窗口题目的轻量占位（只显示纯文本，无组件开销） */
+.question-placeholder {
+  padding: 16px 0;
+  color: var(--color-text-muted);
+  line-height: 1.6;
+  min-height: 60px;
+}
+.question-placeholder .placeholder-idx {
+  font-weight: 600;
+  margin-right: 8px;
+  color: var(--color-text-secondary);
+}
+.question-placeholder .placeholder-type {
+  font-size: 0.8rem;
+  background: var(--color-bg-tag);
+  color: var(--color-text-tag);
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-right: 8px;
+}
+.question-placeholder .placeholder-text {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.95rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
 
 /* 导入对话框 */
 .import-dialog-overlay {
@@ -347,7 +416,13 @@ onErrorCaptured((err) => { console.error(err); renderError.value = String(err); 
 .quiz-main-area > .toolbar + * { padding-top:30px }
 :global(body) { background-color:var(--color-bg-page); color:var(--color-text-primary); margin:0; padding:0; font-family:'Helvetica Neue',Helvetica,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',Arial,sans-serif; transition:background-color .3s,color .3s }
 :global(#app) { min-height:100vh; display:flex; align-items:center; justify-content:center }
-@media (max-width:768px) { .quiz-layout { grid-template-columns:1fr } .quiz-sidebar { position:static; max-height:none; margin-bottom:20px } }
+@media (max-width:768px) {
+  .quiz-layout { flex-direction:column; width:100%; margin:0 auto; gap:12px }
+  .quiz-sidebar { position:static; max-height:none; width:100%; margin-bottom:0 }
+  .quiz-main-area { max-width:100%; margin:0; border-radius:0 }
+  .quiz-main-area > :not(.toolbar) { padding-left:16px; padding-right:16px }
+  .quiz-container-loading, .quiz-container-start { width:100%; padding:24px 16px }
+}
 </style>
 
 <style>

@@ -51,9 +51,8 @@ function confirm(id: number) {
 }
 
 function dismissTop() {
-  if (toasts.value.length > 0) {
-    dismissToast(toasts.value[toasts.value.length - 1].id)
-  }
+  const top = toasts.value[toasts.value.length - 1]
+  if (top) dismissToast(top.id)
 }
 </script>
 

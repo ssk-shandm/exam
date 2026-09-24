@@ -1,24 +1,31 @@
-<template>
+﻿<template>
   <div class="quiz-layout">
-    <div class="quiz-sidebar">
+    <div class="quiz-sidebar" :class="{ 'is-collapsed': !isAnswerCardExpanded }">
       <AnswerCard
-        :questions="shuffledQuestions"
+        :questions="filteredQuestions"
         :answer-sheet="answerSheet"
-        :current-index="currentQuestionIndex"
+        :current-index="answerCardCurrentIndex"
+        :display-numbers="answerCardDisplayNumbers"
+        app-mode="review"
+        :default-expanded="true"
+        :default-pinned="true"
         @jumpTo="handleJumpTo"
+        @update:expanded="isAnswerCardExpanded = $event"
       />
 
-      <div class="filter-container">
-        <label>
-          <input type="checkbox" v-model="showOnlyWrong" />
-          只看错题
-        </label>
-      </div>
+      <div class="review-sidebar-details">
+        <div class="filter-container">
+          <label>
+            <input type="checkbox" v-model="showOnlyWrong" />
+            只看错题
+          </label>
+        </div>
 
-      <div id="final-score-container">
-        <h3>考试结束！</h3>
-        <p id="final-score-text">你答对了 {{ score }} / {{ totalQuestions }} 题。</p>
-        <button id="restart-btn" @click="emit('restart', 'start')">返回首页</button>
+        <div id="final-score-container">
+          <h3>考试结束！</h3>
+          <p id="final-score-text">你答对了 {{ score }} / {{ totalQuestions }} 题。</p>
+          <button id="restart-btn" @click="emit('restart', 'start')">返回首页</button>
+        </div>
       </div>
     </div>
 
@@ -52,6 +59,7 @@
           :answer-format="question.answerFormat"
           :code-language="question.codeLanguage"
           :answer-detail="question.answerDetail"
+          :question-type="question.type"
         />
         <!-- 复合题：显示子题结果汇总 -->
         <div v-else class="compound-review-summary">
@@ -65,16 +73,26 @@
             class="review-sub-item"
             :class="getSubReviewClass(question.number, sub.id)"
           >
-            <span class="review-sub-num">{{ question.number }}.{{ sub.id }}</span>
-            <span class="review-sub-q">{{ sub.question }}</span>
-            <span
-              v-if="getSubReviewResult(question.number, sub.id) === true"
-              class="review-sub-badge correct"
-            >✓</span>
-            <span
-              v-else-if="getSubReviewResult(question.number, sub.id) === false"
-              class="review-sub-badge incorrect"
-            >✗</span>
+            <div class="review-sub-header">
+              <span class="review-sub-num">{{ question.number }}.{{ sub.id }}</span>
+              <span class="review-sub-q">{{ sub.question }}</span>
+              <span
+                v-if="getSubReviewResult(question.number, sub.id) === true"
+                class="review-sub-badge correct"
+              >✓</span>
+              <span
+                v-else-if="getSubReviewResult(question.number, sub.id) === false"
+                class="review-sub-badge incorrect"
+              >✗</span>
+            </div>
+            <!-- 答案对比（单选/多选/填空子题） -->
+            <div
+              v-if="getSubUserAnswer(question.number, sub.id) !== null"
+              class="review-sub-answers"
+            >
+              <span class="review-sub-user">你的答案：{{ getSubUserAnswer(question.number, sub.id) || '（未作答）' }}</span>
+              <span class="review-sub-correct">正确答案：{{ formatSubAnswer(sub) }}</span>
+            </div>
           </div>
         </div>
       </div>
@@ -83,7 +101,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, nextTick } from 'vue'
 import type { Question, UserAnswer, SubAnswer } from '../types'
 import AnswerCard from './AnswerCard.vue'
 import QuestionDisplay from './QuestionDisplay.vue'
@@ -105,6 +123,7 @@ const emit = defineEmits<{
 }>()
 
 const showOnlyWrong = ref(false)
+const isAnswerCardExpanded = ref(true)
 const currentQuestionIndex = ref(0) // 用于高亮答题卡
 const shuffledQuestions = computed(() => props.questions)
 const totalQuestions = computed(() => props.questions.length)
@@ -120,12 +139,26 @@ const filteredQuestions = computed(() => {
   })
 })
 
-function handleJumpTo(index: number) {
-  currentQuestionIndex.value = index
-  const questionNumber = props.questions[index]?.number
-  if (!questionNumber) return
+// 筛选后答题卡只展示当前可见题目，但仍保留其在整张试卷中的题号。
+const answerCardDisplayNumbers = computed(() =>
+  filteredQuestions.value.map((question) => props.questions.indexOf(question) + 1),
+)
 
-  const element = document.getElementById('q-' + questionNumber)
+const answerCardCurrentIndex = computed(() => {
+  const currentQuestion = props.questions[currentQuestionIndex.value]
+  if (!currentQuestion) return -1
+  return filteredQuestions.value.findIndex((question) => question.number === currentQuestion.number)
+})
+
+async function handleJumpTo(index: number) {
+  const question = filteredQuestions.value[index]
+  if (!question) return
+
+  const sourceIndex = props.questions.findIndex((item) => item.number === question.number)
+  if (sourceIndex >= 0) currentQuestionIndex.value = sourceIndex
+
+  await nextTick()
+  const element = document.getElementById('q-' + question.number)
   if (element) {
     element.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
@@ -147,6 +180,20 @@ function getSubReviewResult(qNum: number, subId: number): boolean | null {
   return props.answerSheet.get(qNum)?.subAnswers?.get(subId)?.isCorrect ?? null
 }
 
+/** 获取子题的用户答案文本 */
+function getSubUserAnswer(qNum: number, subId: number): string | null {
+  const sa = props.answerSheet.get(qNum)?.subAnswers?.get(subId)
+  return sa?.userAnswer ?? null
+}
+
+/** 格式化子题正确答案用于展示（多选题字母间加逗号） */
+function formatSubAnswer(sub: { type?: string; answer: string }): string {
+  if (sub.type === '多选题' && sub.answer) {
+    return sub.answer.split('').join(', ')
+  }
+  return sub.answer
+}
+
 function getSubReviewClass(qNum: number, subId: number): string {
   const result = getSubReviewResult(qNum, subId)
   if (result === true) return 'sub-review-correct'
@@ -157,21 +204,47 @@ function getSubReviewClass(qNum: number, subId: number): string {
 
 <style scoped>
 .quiz-layout {
-  display: grid;
-  grid-template-columns: 240px 1fr;
+  display: flex;
+  align-items: flex-start;
   gap: 24px;
   width: 90%;
-  max-width: 1100px;
+  max-width: 1200px;
   margin: 20px auto;
 }
 
 .quiz-sidebar {
   position: sticky;
   top: 20px;
-  align-self: start;
+  align-self: flex-start;
+  flex: 0 0 auto;
+  width: 280px;
   max-height: calc(100vh - 40px);
   overflow-y: auto;
+  overflow-x: hidden;
+  box-sizing: border-box;
   color: var(--color-text-primary);
+  transition: width 0.3s ease;
+}
+
+.quiz-sidebar.is-collapsed {
+  width: 36px;
+}
+
+.review-sidebar-details {
+  width: 280px;
+  max-height: 500px;
+  overflow: hidden;
+  opacity: 1;
+  visibility: visible;
+  transition: max-height 0.3s ease, opacity 0.15s ease, visibility 0s linear 0s;
+}
+
+.quiz-sidebar.is-collapsed .review-sidebar-details {
+  max-height: 0;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.1s ease, visibility 0s linear 0.3s;
 }
 
 .quiz-main-area {
@@ -181,9 +254,9 @@ function getSubReviewClass(qNum: number, subId: number): string {
   border: 1px solid var(--color-border-container);
   padding: 24px;
   box-sizing: border-box;
-  width: 100%;
-  max-width: none;
-  margin: 0;
+  flex: 1;
+  max-width: 800px;
+  margin: 0 auto;
 }
 .no-questions-text {
   text-align: center;
@@ -244,6 +317,8 @@ function getSubReviewClass(qNum: number, subId: number): string {
   padding-bottom: 20px;
   border-bottom: 1px solid var(--color-border-divider);
   scroll-margin-top: 20px;
+  content-visibility: auto;
+  contain-intrinsic-size: auto 320px;
 }
 .review-question-block:last-child {
   border-bottom: none;
@@ -252,13 +327,18 @@ function getSubReviewClass(qNum: number, subId: number): string {
 
 @media (max-width: 768px) {
   .quiz-layout {
-    grid-template-columns: 1fr;
+    display: block;
   }
   .quiz-sidebar {
     position: static;
     top: auto;
     max-height: none;
     overflow-y: visible;
+    width: 100%;
+    max-width: 100%;
+  }
+  .quiz-sidebar.is-collapsed {
+    width: 36px;
   }
 }
 
@@ -276,12 +356,17 @@ function getSubReviewClass(qNum: number, subId: number): string {
 }
 .review-sub-item {
   display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 10px;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 10px;
   margin: 4px 0;
   border-radius: 4px;
   font-size: 0.9rem;
+}
+.review-sub-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 .review-sub-item.sub-review-correct {
   background-color: var(--color-bg-sub-correct);
@@ -307,5 +392,18 @@ function getSubReviewClass(qNum: number, subId: number): string {
 }
 .review-sub-badge.incorrect {
   color: var(--color-badge-incorrect);
+}
+.review-sub-answers {
+  display: flex;
+  gap: 16px;
+  padding-left: 28px;
+  font-size: 0.85rem;
+}
+.review-sub-user {
+  color: var(--color-text-primary);
+}
+.review-sub-correct {
+  color: var(--color-badge-correct);
+  font-weight: 600;
 }
 </style>

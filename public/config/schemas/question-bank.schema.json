@@ -1,0 +1,123 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://exam.local/schemas/question-bank.schema.json",
+  "title": "刷题助手标准题库",
+  "type": "array",
+  "items": { "$ref": "#/$defs/question" },
+  "$defs": {
+    "format": {
+      "type": "string",
+      "enum": ["text", "markdown"]
+    },
+    "options": {
+      "type": "object",
+      "propertyNames": { "pattern": "^[A-Z]$" },
+      "additionalProperties": { "type": "string" }
+    },
+    "answer": {
+      "oneOf": [
+        { "type": "string" },
+        { "type": "boolean" },
+        { "type": "number" },
+        {
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        }
+      ]
+    },
+    "answerDetail": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["accepts"],
+      "properties": {
+        "accepts": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string" },
+          "uniqueItems": true
+        }
+      }
+    },
+    "subQuestion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "type", "content", "answer"],
+      "properties": {
+        "id": { "type": "integer", "minimum": 1 },
+        "type": {
+          "enum": ["single", "multiple", "fill", "short-answer", "program-analysis", "code"]
+        },
+        "content": { "type": "string", "minLength": 1 },
+        "format": { "$ref": "#/$defs/format" },
+        "options": { "$ref": "#/$defs/options" },
+        "answer": { "$ref": "#/$defs/answer" },
+        "answerDetail": { "$ref": "#/$defs/answerDetail" },
+        "answerFormat": { "$ref": "#/$defs/format" },
+        "codeLanguage": { "type": "string" }
+      }
+    },
+    "question": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "number", "type", "content", "answer"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "number": { "type": "integer", "minimum": 1 },
+        "type": {
+          "enum": [
+            "single",
+            "multiple",
+            "true-false",
+            "fill",
+            "short-answer",
+            "program-analysis",
+            "code",
+            "compound"
+          ]
+        },
+        "content": { "type": "string", "minLength": 1 },
+        "format": { "$ref": "#/$defs/format" },
+        "options": { "$ref": "#/$defs/options" },
+        "answer": { "$ref": "#/$defs/answer" },
+        "explanation": { "type": "string" },
+        "wrongDescription": { "type": "string" },
+        "answerDetail": { "$ref": "#/$defs/answerDetail" },
+        "images": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        },
+        "scenario": { "type": "string" },
+        "subQuestions": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/subQuestion" }
+        },
+        "answerFormat": { "$ref": "#/$defs/format" },
+        "scenarioFormat": { "$ref": "#/$defs/format" },
+        "explanationFormat": { "$ref": "#/$defs/format" },
+        "codeLanguage": { "type": "string" }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "type": { "enum": ["single", "multiple"] } },
+            "required": ["type"]
+          },
+          "then": {
+            "required": ["options"],
+            "properties": { "options": { "minProperties": 2 } }
+          }
+        },
+        {
+          "if": {
+            "properties": { "type": { "const": "compound" } },
+            "required": ["type"]
+          },
+          "then": { "required": ["subQuestions"] }
+        }
+      ]
+    }
+  }
+}

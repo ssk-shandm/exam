@@ -19,7 +19,8 @@ exam/
 │       └── lib.rs            # Rust 命令（get_app_version）
 ├── public/
 │   ├── config/
-│   │   └── version.sample.json   # 远程版本检查 JSON 模板
+│   │   └── examples/
+│   │       └── version.example.json   # 远程版本检查 JSON 模板
 │   └── subjects/                 # 各科题库 JSON
 ```
 
@@ -187,3 +188,18 @@ npx tauri icon path/to/your-icon.png
 | `npm run tauri:dev` | Tauri 桌面开发模式 |
 | `npm run tauri:build` | 打包成 exe/安装包 |
 | `npm run tauri icon <图片>` | 从 PNG 生成各平台图标 |
+---
+
+## AI 配置文件在桌面端的保存位置
+
+桌面端不会改写安装目录中的文件。设置页保存 AI 参数时，会通过 `read_llm_config` / `write_llm_config` 命令读写 Tauri 的系统应用配置目录：
+
+```text
+<app_config_dir>/llm-config.txt
+```
+
+首次读取且文件不存在时，应用会复制项目内置的 `config/llm-config.json` 作为默认值。Temperature、最大输出 Token、请求超时和 OCR 参数都保存在该文件中；API Key 仅保存在当前 WebView 的 `sessionStorage`，不会写入磁盘配置。
+
+该 `.txt` 可直接用记事本等文本编辑器读写，内容仍使用 JSON 格式。如果检测到旧版 `llm-config.json`，会先复制为 `llm-config.txt`，避免丢失已有配置。外部编辑保存后，在设置页点击“重新读取”即可应用。
+
+开发浏览器版 `npm run dev` 则直接读写仓库根目录的 `config/llm-config.json`。扫描 PDF 首次使用 OCR 时通常需要联网下载 Tesseract 语言数据。

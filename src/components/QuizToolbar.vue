@@ -22,8 +22,9 @@
       </button>
     </template>
 
-    <!-- 错题：清空 + 导出 -->
+    <!-- 错题：重置答案 + 清空 + 导出 -->
     <template v-if="mode === 'wrong'">
+      <button v-if="wrongCount > 0" @click="$emit('clearWrongAnswers')" class="toolbar-btn reset-answers">清空答案</button>
       <button v-if="wrongCount > 0" @click="$emit('clearWrong')" class="toolbar-btn clear-wrong">清空错题本</button>
       <button v-if="wrongCount > 0" @click="$emit('exportWrong')" class="toolbar-btn export">导出错题</button>
     </template>
@@ -64,6 +65,7 @@ defineEmits<{
   toggleShuffle: []
   addToWrongBook: []
   clearWrong: []
+  clearWrongAnswers: []
   exportWrong: []
 }>()
 </script>
@@ -130,6 +132,13 @@ defineEmits<{
 }
 .toolbar-btn.export:hover {
   background-color: var(--color-bg-btn-info-hover);
+}
+.toolbar-btn.reset-answers {
+  background-color: var(--color-bg-btn-purple);
+  color: var(--color-text-btn-purple);
+}
+.toolbar-btn.reset-answers:hover {
+  background-color: var(--color-bg-btn-purple-hover);
 }
 .toolbar-btn.clear-wrong {
   background-color: var(--color-bg-btn-danger);

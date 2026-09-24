@@ -13,29 +13,31 @@
  *   "prebuild": "node scripts/generate-banks.mjs"
  */
 
-import { readFileSync, writeFileSync } from 'fs';
-import { join, dirname } from 'path';
-import { fileURLToPath } from 'url';
+import { writeFileSync, mkdirSync, readdirSync } from 'fs'
+import { join, dirname } from 'path'
+import { fileURLToPath } from 'url'
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const subjectsDir = join(__dirname, '..', 'public', 'subjects');
+const __dirname = dirname(fileURLToPath(import.meta.url))
+const publicDir = join(__dirname, '..', 'public')
+const subjectsDir = join(publicDir, 'subjects')
 
-// 用 Vite 的 Glob 功能是不可能的，这里用 fs 扫描
-import { readdirSync } from 'fs';
-
-/** 提取文件名中的序号前缀（如果有），用于排序 */
-function sortKey(name) {
-  const m = name.match(/^(\d+)/);
-  return m ? parseInt(m[1]) : 999;
+/** 确保 Web 版运行所需的 public 子目录存在 */
+function ensurePublicDirectories() {
+  for (const directory of ['subjects', 'images', 'config']) {
+    mkdirSync(join(publicDir, directory), { recursive: true })
+  }
 }
 
+
 function main() {
-  let files;
+  ensurePublicDirectories()
+
+  let files
   try {
-    files = readdirSync(subjectsDir);
+    files = readdirSync(subjectsDir)
   } catch {
-    console.error(`[generate-banks] 无法读取目录: ${subjectsDir}`);
-    process.exit(1);
+    console.error(`[generate-banks] 无法读取目录: ${subjectsDir}`)
+    process.exit(1)
   }
 
   const banks = files
@@ -46,19 +48,19 @@ function main() {
     }))
     .sort((a, b) => {
       // 中文字符优先（按拼音/笔画），非中文按字母
-      const aCn = /[\u4e00-\u9fff]/.test(a.name);
-      const bCn = /[\u4e00-\u9fff]/.test(b.name);
-      if (aCn && !bCn) return -1;
-      if (!aCn && bCn) return 1;
-      return a.name.localeCompare(b.name, 'zh-CN');
-    });
+      const aCn = /[\u4e00-\u9fff]/.test(a.name)
+      const bCn = /[\u4e00-\u9fff]/.test(b.name)
+      if (aCn && !bCn) return -1
+      if (!aCn && bCn) return 1
+      return a.name.localeCompare(b.name, 'zh-CN')
+    })
 
-  const outPath = join(subjectsDir, 'banks.json');
-  writeFileSync(outPath, JSON.stringify(banks, null, 2), 'utf-8');
-  console.log(`[generate-banks] ✅ 已生成 ${banks.length} 个题库清单 → public/subjects/banks.json`);
+  const outPath = join(subjectsDir, 'banks.json')
+  writeFileSync(outPath, JSON.stringify(banks, null, 2), 'utf-8')
+  console.log(`[generate-banks] ✅ 已生成 ${banks.length} 个题库清单 → public/subjects/banks.json`)
   for (const b of banks) {
-    console.log(`   - ${b.name}  (${b.file})`);
+    console.log(`   - ${b.name}  (${b.file})`)
   }
 }
 
-main();
+main()

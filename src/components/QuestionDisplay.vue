@@ -1,7 +1,7 @@
 <template>
   <div>
     <div id="quiz-header">
-      <h2 id="question-text">{{ question.question }}</h2>
+      <div id="question-text"><MarkdownContent :content="question.question" :format="question.format" /></div>
       <div id="question-meta">
         <span id="question-type">{{ question.type }}</span>
         <span id="question-number">
@@ -50,7 +50,7 @@
             @change="emitAnswer(key)"
             :disabled="disabled"
           />
-          {{ key }}: {{ text }}
+          <strong>{{ key }}:</strong><MarkdownContent class="option-content" :content="text" :format="question.format" />
         </label>
       </div>
 
@@ -68,7 +68,7 @@
             @change="updateCheckbox(key)"
             :disabled="disabled"
           />
-          {{ key }}: {{ text }}
+          <strong>{{ key }}:</strong><MarkdownContent class="option-content" :content="text" :format="question.format" />
         </label>
       </div>
 
@@ -146,12 +146,12 @@
 
     <div v-if="isEndorseMode" class="endorse-answer-block">
       <p class="endorse-text"><strong>正确答案：</strong></p>
-      <div v-if="isMarkdownAnswer" class="markdown-answer-block" v-html="renderedAnswer"></div>
-      <p v-else class="endorse-text">{{ question.answer }}</p>
+      <MarkdownContent class="markdown-answer-block" :content="question.answer" :format="question.answerFormat" />
 
-      <p class="endorse-text" v-if="question.explanation">
-        <strong>解析：</strong>{{ question.explanation }}
-      </p>
+      <div class="endorse-text" v-if="question.explanation">
+        <strong>解析：</strong>
+        <MarkdownContent :content="question.explanation" :format="question.explanationFormat" />
+      </div>
     </div>
 
     <ResultDisplay
@@ -165,6 +165,11 @@
       :answer-detail="question.answerDetail"
       :question-type="question.type"
     />
+
+    <div v-if="isInWrongMode && question.wrongDescription" class="wrong-description">
+      <strong>错题描述：</strong>
+      <MarkdownContent :content="question.wrongDescription" :format="question.format" />
+    </div>
 
     <div class="wrong-question-controls" v-if="isInPracticeMode || isInWrongMode">
       <button v-if="isInPracticeMode && !isWrongQuestion && !isGuessedRight" @click="addToWrong" class="wrong-btn add">
@@ -188,10 +193,10 @@
 
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import { renderMarkdown } from '../utils/markdown'
 import type { Question, UserAnswer, AppMode, SubAnswer } from '../types'
 import ResultDisplay from './ResultDisplay.vue'
 import CompoundQuestion from './CompoundQuestion.vue'
+import MarkdownContent from './MarkdownContent.vue'
 import { useQuizStore } from '../stores/quizStore'
 import { showToast } from '../composables/useToast'
 
@@ -228,9 +233,9 @@ const emit = defineEmits<{
 const judgmentOptions = { A: '正确', B: '错误' }
 
 // 题型判断
-const isRadio = computed(() => ['单选题', '单选', '判断题', '判断'].includes(props.question.type))
-const isCheckbox = computed(() => ['多选题', '多选'].includes(props.question.type))
-const isFillInBlank = computed(() => ['填空题', '填空'].includes(props.question.type))
+const isRadio = computed(() => props.question.type === '单选题' || props.question.type === '判断题')
+const isCheckbox = computed(() => props.question.type === '多选题')
+const isFillInBlank = computed(() => props.question.type === '填空题')
 /** 填空题的空位数：统计题目文本中 ______ 的出现次数 */
 const blankCount = computed(() => {
   if (!isFillInBlank.value) return 0
@@ -261,26 +266,16 @@ function updateBlank(idx: number, value: string) {
   // 用中文分号连接后向上传递
   emitAnswer(copy.join('；'))
 }
-const isShortAnswer = computed(() => ['简答题', '简答'].includes(props.question.type))
-const isProgramAnalysis = computed(() => ['程序分析题', '程序分析'].includes(props.question.type))
-const isCodeQuestion = computed(() => ['编程题', '编程', '代码题'].includes(props.question.type))
-const isCompound = computed(
-  () =>
-    ['SQL综合题', '综合题', '复合题'].includes(props.question.type) &&
-    props.question.subQuestions &&
-    props.question.subQuestions.length > 0,
+const isShortAnswer = computed(() => props.question.type === '简答题')
+const isProgramAnalysis = computed(() => props.question.type === '程序分析题')
+const isCodeQuestion = computed(() => props.question.type === '编程题')
+const isCompound = computed(() =>
+  (props.question.type === '综合题' || props.question.type === '综合应用题') &&
+  Boolean(props.question.subQuestions?.length),
 )
 
 const isEndorseMode = computed(() => props.disabled && !props.showResult)
 
-// 代码/Markdown 渲染逻辑
-const isMarkdownAnswer = computed(() => {
-  return props.question.answerFormat === 'markdown'
-})
-const renderedAnswer = computed(() => {
-  if (!isMarkdownAnswer.value || props.question.answer == null) return ''
-  return renderMarkdown(props.question.answer)
-})
 
 const isPracticeAutoSubmit = computed(() => {
   return (
@@ -296,7 +291,7 @@ const isPracticeAutoSubmit = computed(() => {
 
 const options = computed(() => {
   const type = props.question.type
-  if (type === '判断题' || type === '判断') {
+  if (type === '判断题') {
     return judgmentOptions
   }
   return props.question.options
@@ -304,8 +299,6 @@ const options = computed(() => {
 
 const isInPracticeMode = computed(() => ['practice', 'specialize'].includes(props.appMode))
 const isInWrongMode = computed(() => props.appMode === 'wrong')
-const isInSpecializeMode = computed(() => props.appMode === 'specialize')
-
 const isWrongQuestion = computed(() =>
   props.bankFile ? quizStore.containsWrongEntry(props.question.number, props.bankFile) : false,
 )
@@ -462,7 +455,9 @@ function getOptionClass(key: string) {
   gap: 12px;
 }
 .option-label {
-  display: block;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
   background-color: var(--color-bg-option);
   border: 1px solid var(--color-border-option);
   border-radius: 8px;
@@ -475,7 +470,11 @@ function getOptionClass(key: string) {
   background-color: var(--color-bg-surface-hover);
 }
 .option-label input {
-  margin-right: 10px;
+  margin-top: 4px;
+}
+.option-content {
+  flex: 1;
+  min-width: 0;
 }
 input:disabled {
   cursor: not-allowed;
@@ -645,6 +644,20 @@ input:disabled {
   border-radius: 4px;
   font-family: 'Fira Code', Consolas, Monaco, monospace;
   font-size: 0.9em;
+}
+
+.wrong-description {
+  margin-top: 16px;
+  padding: 12px 14px;
+  border-left: 4px solid #e67e22;
+  border-radius: 8px;
+  background: color-mix(in srgb, #e67e22 10%, var(--color-bg-container));
+  color: var(--color-text-secondary);
+}
+.wrong-description strong {
+  display: block;
+  margin-bottom: 6px;
+  color: #d35400;
 }
 
 .wrong-question-controls {

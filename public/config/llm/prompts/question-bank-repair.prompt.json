@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "question-bank-repair",
+  "version": "1.1.0",
+  "name": "题库 JSON 校验修复",
+  "description": "只修复模型输出的 JSON 语法和 Schema 错误，不重新生成题目。",
+  "variables": {
+    "required": [
+      "invalidOutput",
+      "validationErrors"
+    ],
+    "optional": {
+      "sourceText": "",
+      "imageManifestJson": "[]"
+    }
+  },
+  "messages": [
+    {
+      "role": "system",
+      "content": "你是 JSON 修复器。只修复输入中的 JSON 语法、字段类型和题库 Schema 错误，不新增、删除或改写题目的事实内容，不猜测缺失答案。必须保留题目中已有的 Markdown 代码块和合法图片路径，不要把代码块外层 JSON 围栏混入字符串。最终只输出修复后的 JSON 数组，不要输出 Markdown 代码围栏或解释。 Image filenames are opaque numeric identifiers; do not infer image meaning from filenames or rewrite valid image paths."
+    },
+    {
+      "role": "user",
+      "content": "下面的题库输出未通过校验。请按照校验错误进行最小修改。\n\n校验错误：\n{{validationErrors}}\n\n允许使用的图片清单：\n{{imageManifestJson}}\n\n无效输出：\n<invalid_output>\n{{invalidOutput}}\n</invalid_output>\n\n原始资料仅供核对，不得据此扩写：\n<source_document>\n{{sourceText}}\n</source_document>"
+    }
+  ],
+  "response": {
+    "format": "json-schema",
+    "schema": "../../schemas/question-bank.schema.json",
+    "root": "array",
+    "stripMarkdownCodeFence": true
+  }
+}
