@@ -1,7 +1,6 @@
 # 别卷
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-![Python: Not Required](https://img.shields.io/badge/Python-Not%20Required-3776ab?logo=python&logoColor=white)
 ![Vue 3](https://img.shields.io/badge/Vue-3-42b883?logo=vuedotjs&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6?logo=typescript&logoColor=white)
 ![Tauri 2](https://img.shields.io/badge/Tauri-2-ffc131?logo=tauri&logoColor=white)
