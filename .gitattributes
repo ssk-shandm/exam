@@ -3,6 +3,12 @@
 # Keep documentation out of the language breakdown.
 *.md linguist-documentation
 
+# Deployment and local helper scripts are not application source code.
+Dockerfile linguist-detectable=false
+*.dockerfile linguist-detectable=false
+*.bat linguist-detectable=false
+*.cmd linguist-detectable=false
+
 # Configuration and data files are not application source code.
 *.json linguist-detectable=false
 *.toml linguist-detectable=false
